@@ -5,3 +5,5 @@ NanoMaterialsCAD is an open source tool for computational materials and chemistr
 1. I/O formats available
 * VASP 
 * LAMMPS
+
+The executable of the software is placed in WINDOWSx64_binary\NanoMaterialsCAD\Release\NanoMaterialsCAD.exe. Download the directory and run the executable to use it. 
