@@ -27,8 +27,8 @@ EXT HWND jgn_help_to_map_the_draw_func;		// saves the hwnd of the most recent pa
 
 EXT void* jgn_curent_window_to_edit;			// the pointer to the draw func that it is about to be used
 EXT int jgn_Child_C;							// how many child windows?
-EXT map<HWND,int> jgn_hwnd_int_map;					// map hwnd of the parent windows created to an int counter
-EXT map<int,int> jgn_int_macro_map;					// maps a number to a macro class so every window has its own class		
+EXT std::map<HWND,int> jgn_hwnd_int_map;					// map hwnd of the parent windows created to an int counter
+EXT std::map<int,int> jgn_int_macro_map;					// maps a number to a macro class so every window has its own class		
 EXT HGLRC  hglrc;
 //#define JGN_Init() \
 // ( \
@@ -44,7 +44,7 @@ EXT HGLRC  hglrc;
 //  (jgn_int_macro_map[9] = IDC_JGNCLASS9), \
 //  (void)0 \
 // )
-EXT map<void* , HWND> jgn_dawfunc_hwnd_map;			// maps the draw func that the user created, to the hwnd
+EXT std::map<void* , HWND> jgn_dawfunc_hwnd_map;			// maps the draw func that the user created, to the hwnd
 EXT HWND hWnd[10];									// hwnd of the parent window up to 10
 EXT int jgn_wndcnt;								// how many parent wnd?
 EXT RECT jgn_glbrect;							// a global rect to init window position and size
@@ -71,7 +71,7 @@ void MakeScroll();
 
 /////////////////////////////
 HWND JGN_CreateWindow(char* EszTitle,int nCmdShow,HINSTANCE hInstance );
-HWND JGN_CreateTray(string traytitle, HINSTANCE hInstance);
+HWND JGN_CreateTray(std::string traytitle, HINSTANCE hInstance);
 void JGN_MainLoop();
 void JGN_CreateChild(char* txt, int x, int y, int w, int h, char* clas, DWORD, HWND);
 EXT void(*JGN_Global_Draw[10])();
@@ -241,7 +241,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam);
 //
 //Tray
 //
-HWND JGN_CreateTray(string traytitle, HINSTANCE hInstance = hInst);
+HWND JGN_CreateTray(std::string traytitle, HINSTANCE hInstance = hInst);
 
 
 

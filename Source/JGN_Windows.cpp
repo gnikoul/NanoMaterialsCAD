@@ -5,6 +5,10 @@
 #include "JGN_Resource.h"
 #include "JGN_DropFile.h"
 #include "JGN_Windows.h"
+#include "ToolBar.h"
+#include "JGN_DropFile.h"
+#include "Cammera.h"
+#define JGN_CMD_PLANE
 
 /////////////////////////////////////////////////
 //
@@ -52,6 +56,7 @@ HWND JGN_CreateWindow(char* EszTitle,
 
 	DragAcceptFiles(jgn_help_to_map_the_draw_func, TRUE);
 	//wglDeleteContext(hglrc);
+
 	return jgn_help_to_map_the_draw_func;
 }
 void JGN_InitOpenGL()
@@ -141,7 +146,6 @@ void JGN_ClearColor(BYTE r, BYTE g, BYTE  b, BYTE a)
 ATOM JGN_RegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
-
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_DBLCLKS; //CS_HREDRAW | CS_VREDRAW | redraws the hall screen when resized, couses flicks
@@ -233,7 +237,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 			-1.05, +1.05,
 			-1.05 * (GLfloat)he / (GLfloat)w, +1.05 * (GLfloat)he / (GLfloat)w,
 			-10.0, 10.0);
-
+		dipleft = -1.05;
+		dipapan = -1.05 * (GLfloat)he / (GLfloat)w;
 	}
 	else
 	{
@@ -241,6 +246,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 			-1.05 * (GLfloat)w / (GLfloat)he, +1.05 * (GLfloat)w / (GLfloat)he,
 			-1.05, +1.05,
 			-10.0, 10.0);
+		dipleft = -1.05*(GLfloat)w / (GLfloat)he;
+		dipapan = 1.05;
 	}
 	glMatrixMode(GL_MODELVIEW);
 
@@ -284,7 +291,10 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	jgn_glbrect = { 0,0,0,0 };
 
-
+	hdc = GetDC((HWND)menu);
+	SetTextColor(hdc, RGB(0, 255, 255));
+	SetBkColor(hdc, RGB(50, 50, 50));
+	DeleteDC(hdc);
 
 
 	return h;
@@ -452,45 +462,14 @@ void ____JGN_DisplayF()
 
 	for (int i = 0; i < jgn_wndcnt; i++)
 	{
-
-		jgn_curent_window_to_edit = JGN_Global_Draw[i];
-
-
-		HDC global_hdc = GetDC(jgn_dawfunc_hwnd_map[jgn_curent_window_to_edit]);
-
-
-
-		//hdc = BeginPaint(jgn_dawfunc_hwnd_map[jgn_curent_window_to_edit], &ps);
-
-		/*hdcMem = CreateCompatibleDC(hdc);
-		hbmMem = CreateCompatibleBitmap(hdc, 1000, 1000);
-
-		hOld = SelectObject(hdcMem, hbmMem);*/
-
-		cout << 1 << endl;
+	
 
 		JGN_Global_Draw[0]();
-		cout << 4 << endl;
-
-
-		//BitBlt(hdc, 0, 0, 1000, 1000, hdcMem, 0, 0, SRCCOPY);
-
-		//// Free-up the off-screen DC
-		//SelectObject(hdcMem, hOld);
-		//DeleteObject(hbmMem);
-		//DeleteDC(hdcMem);
-
-		//EndPaint(jgn_dawfunc_hwnd_map[jgn_curent_window_to_edit], &ps);
-
-
 
 		SwapBuffers(global_hdc);
 
+		//DeleteDC(global_hdc);
 
-
-		DeleteDC(global_hdc);
-
-		//UpdateWindow(jgn_dawfunc_hwnd_map[jgn_curent_window_to_edit]);
 	}
 
 	//RedrawWindow(hWnd, NULL, NULL, RDW_INTERNALPAINT);
@@ -591,93 +570,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		//print the droped path
-		found = std::string(inpf).find(".lmp");
-		if (found != std::string::npos)
-		{
-			ftype = 'l';
-		}
-		else
-		{
-			ftype = 'p';
-		}
-
-
-		//open the droped path
-		uc_file = fopen(inpf, "r");
 
 
 
-		//initialize facetes
-		S1i[0] = atoi(S1) / 100;
-		S1i[1] = fmod(atoi(S1) / 10, 10);
-		S1i[2] = fmod(atoi(S1), 10);
-
-		S2i[0] = atoi(S2) / 100;
-		S2i[1] = fmod(atoi(S2) / 10, 10);
-		S2i[2] = fmod(atoi(S2), 10);
-
-		S3i[0] = atoi(S3) / 100;
-		S3i[1] = fmod(atoi(S3) / 10, 10);
-		S3i[2] = fmod(atoi(S3), 10);
-
-		//shorting bullshit
-		if (S1[3] != '\0')
-		{
-			//__asm {
-			//	mov esi, [S1]
-			//	mov[esi + 3], 0
-			//}
-			S1[3] = '\0';
-		}
-		if (S2[3] != '\0') {
-			//__asm {
-			//	mov esi, [S2]
-			//	mov[esi + 3], 0
-			//}
-			S2[3] = '\0';
-
-		}if (S3[3] != '\0')
-		{
-			//__asm {
-			//	mov esi, [S3]
-			//	mov[esi + 3], 0
-			//}
-			S3[3] = '\0';
-
-		}
-
-		//define Svmax for a proper display (zoom)
-		//__asm {
-		//	mov esi, [S1v]
-		//	mov[Svmax], esi
-		//}
-		Svmax = S1v;
-		//Svmax = S1v;
-		if (S2v > Svmax)
-		{
-			/*__asm {
-				mov esi, [S2v]
-				mov[Svmax], esi
-			}*/
-			Svmax = S2v;
-		}
-		if (S3v > Svmax)
-		{
-			/*__asm {
-				mov esi, [S3v]
-				mov[Svmax], esi
-			}*/
-			Svmax = S3v;
-		}
-		/*__asm {
-			mov esi, [Svmax]
-			mov[Svmax_buckup], esi
-		}*/
-		Svmax_buckup = Svmax;
 
 
-		JGN_DropFile();
+
+		JGN_DropFile(inpf);
 
 		DragFinish((HDROP)wParam);
 
@@ -692,15 +591,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOVE:
 		GetWindowRect(mnhwnd, glb_rct);
 		SetWindowPos(CommandTextField, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 42, (*glb_rct).right - (*glb_rct).left - 14, 35, SWP_ASYNCWINDOWPOS);
+#if !defined(JGN_NO_CMD_HISTORY) 
 		SetWindowPos(CommandTextHistory, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 286, (*glb_rct).right - (*glb_rct).left - 15, 242, SWP_ASYNCWINDOWPOS);
-
+#endif
 		//JGN_PostRedisplay();
 		break;
 	case WM_MOVING:
 
 		GetWindowRect(mnhwnd, glb_rct);
 		SetWindowPos(CommandTextField, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 42, (*glb_rct).right - (*glb_rct).left - 14, 35, SWP_ASYNCWINDOWPOS);
+#if !defined(JGN_NO_CMD_HISTORY) 
 		SetWindowPos(CommandTextHistory, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 286, (*glb_rct).right - (*glb_rct).left - 15, 242, SWP_ASYNCWINDOWPOS);
+#endif
 
 		//JGN_PostRedisplay();
 
@@ -815,7 +717,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Keyboard Messages
 		//
 	case WM_KEYDOWN:
-		____JGN_KeyboardFunc(wParam, JGN_DOWN, jgn_GlobalMouseCooX, jgn_GlobalMouseCooY, hWnd);
+		if (wParam == VK_CAPITAL)
+		{
+			if ((GetKeyState(VK_CAPITAL) & 0x0001) != 0)
+				capson = true;
+			else
+				capson = false;
+		}
+		else
+		{
+			____JGN_KeyboardFunc(wParam, JGN_DOWN, jgn_GlobalMouseCooX, jgn_GlobalMouseCooY, hWnd);
+		}
 		break;
 	case WM_KEYUP:
 		____JGN_KeyboardFunc(wParam, JGN_UP, jgn_GlobalMouseCooX, jgn_GlobalMouseCooY, hWnd);
@@ -838,10 +750,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		mainwndsize[1] = *(mnrcpt + 3) - *(mnrcpt + 1);
 
 		SetWindowPos(CommandTextField, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 42, (*glb_rct).right - (*glb_rct).left - 14, 35, SWP_ASYNCWINDOWPOS);
+#if !defined(JGN_NO_CMD_HISTORY) 
 		SetWindowPos(CommandTextHistory, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 286, (*glb_rct).right - (*glb_rct).left - 15, 242, SWP_ASYNCWINDOWPOS);
+#endif
+		SetWindowPos(CommandTextField, HWND_TOP, (*glb_rct).left + 7, (*glb_rct).bottom - 42, (*glb_rct).right - (*glb_rct).left - 14, 35, SWP_ASYNCWINDOWPOS);
+		DestroyWindow(hWndList);
 		RedrawWindow(CommandTextField, 0, 0, RDW_NOERASE);
 
 		wasfullscreenflagout++;
+		tb.initPositions();
 
 		if (wParam == SIZE_MAXIMIZED)
 		{
@@ -861,8 +778,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		}
 
-
-
+		
 
 		break;
 	case WM_EXITSIZEMOVE:
@@ -905,10 +821,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDM_NT:
 
-			max_xyz[0] = crystal[2 + 5 * 0];
-			min_xyz[0] = crystal[2 + 5 * 0];
+			//max_xyz[0] = crystal[2 + 5 * 0];
+			//min_xyz[0] = crystal[2 + 5 * 0];
 
-			for (ole3 = 0; ole3 < t * (sized[0])*(sized[1])*(sized[2]); ole3++)
+			/*for (ole3 = 0; ole3 < t * (sized[0])*(sized[1])*(sized[2]); ole3++)
 			{
 				if (crystal[2 + 5 * ole3] > max_xyz[0])
 				{
@@ -920,7 +836,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				}
 
+			}*/
+			max_xyz[0] = vs.group[0].position[0].x;
+			min_xyz[0] = vs.group[0].position[0].x;
+			for (int g = 0; g < vs.N_groups; g++)
+			{
+				for (int i = 0; i < vs.group[g].N_atoms; i++)
+				{
+					if (vs.group[g].position[i].x > max_xyz[0])
+					{
+						max_xyz[0] = vs.group[g].position[i].x;
+					}
+					else if (vs.group[g].position[i].x < min_xyz[0])
+					{
+						min_xyz[0] = vs.group[g].position[i].x;
+					}
+				}
 			}
+
 			sized[0] = custom_sized[0];
 			sized[1] = custom_sized[1];
 			sized[2] = custom_sized[2];
@@ -979,18 +912,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			periodic_table = fopen("periodic_table.jgn", "r");
 
-			crystal = (float*)realloc(NULL, sizeof(float)*(sized[0] * sized[1] * sized[2] * t * 5));
+			jgn::heapRealloc();
+			/*crystal = (float*)realloc(NULL, sizeof(float)*(sized[0] * sized[1] * sized[2] * t * 5));
 			selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(sized[0] * sized[1] * sized[2] * t * 3));
 			isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 			for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 			{
 				isSelected[i] = false;
 			}
-			selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+			isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 			for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 			{
-				selective_render[i] = true;
-			}
+				isdeleted[i] = false;
+			}*/
 
 
 			//crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1102,18 +1036,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			periodic_table = fopen("periodic_table.jgn", "r");
 
-			crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+
+			jgn::heapRealloc();
+			/*crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
 			selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
 			isSelected = (bool*)realloc(isSelected, sizeof(bool)*t);
 			for (int i = 0; i < t; i++)
 			{
 				isSelected[i] = false;
 			}
-			selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+			isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 			for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 			{
-				selective_render[i] = true;
-			}
+				isdeleted[i] = false;
+			}*/
 
 
 			//crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1190,10 +1126,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			break;
 		case IDM_PERSPECTIVE_TUGLE:
-			if (perspective_on)
+			if (cam.perspective_on)
 			{
 
-				perspective_on = 0;
+				cam.perspective_on = 0;
 				glViewport(0, 0, width, height);//(first 2 sets the lower left corner of the window w h sets width height of the window
 				glMatrixMode(GL_PROJECTION);// defines the camera behavior projection is the view point of me
 				glLoadIdentity();
@@ -1203,8 +1139,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						-1.05, +1.05,
 						-1.05 * (GLfloat)height / (GLfloat)width, +1.05 * (GLfloat)height / (GLfloat)width,
 						-10.0, 10.0);
-					dipleft = -1;
-
+					dipleft = -1.05;
+					dipapan = -1.05 * (GLfloat)height / (GLfloat)width;
 
 				}
 				else
@@ -1213,8 +1149,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						-1.05 * (GLfloat)width / (GLfloat)height, +1.05 * (GLfloat)width / (GLfloat)height,
 						-1.05, +1.05,
 						-10.0, 10.0);
-					dipleft = -(GLfloat)width / (GLfloat)height;
-
+					dipleft = -1.05*(GLfloat)width / (GLfloat)height;
+					dipapan = 1.05 * (GLfloat)width / (GLfloat)height;
 				}
 				glMatrixMode(GL_MODELVIEW);
 
@@ -1222,7 +1158,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				perspective_on = 1;
+				cam.perspective_on = 1;
 
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
@@ -1254,18 +1190,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				periodic_table = fopen("periodic_table.jgn", "r");
 
-				crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+				jgn::heapRealloc();
+				/*crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
 				selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
 				isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
 					isSelected[i] = false;
 				}
-				selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+				isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
-					selective_render[i] = true;
-				}
+					isdeleted[i] = false;
+				}*/
 
 
 				//crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1381,18 +1318,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				periodic_table = fopen("periodic_table.jgn", "r");
 
-				crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+				jgn::heapRealloc();
+				/*crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
 				selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
 				isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
 					isSelected[i] = false;
 				}
-				selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+				isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
-					selective_render[i] = true;
-				}
+					isdeleted[i] = false;
+				}*/
 
 
 				//	crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1512,18 +1450,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				periodic_table = fopen("periodic_table.jgn", "r");
 
-				crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+				jgn::heapRealloc();
+				/*crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
 				selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
 				isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
 					isSelected[i] = false;
 				}
-				selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+				isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
-					selective_render[i] = true;
-				}
+					isdeleted[i] = false;
+				}*/
 
 
 				//	crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1642,18 +1581,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				periodic_table = fopen("periodic_table.jgn", "r");
 
-				crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+				jgn::heapRealloc();
+				/*crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
 				selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
 				isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
 					isSelected[i] = false;
 				}
-				selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+				isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
-					selective_render[i] = true;
-				}
+					isdeleted[i] = false;
+				}*/
 
 
 				//	crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1781,18 +1721,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				periodic_table = fopen("periodic_table.jgn", "r");
 
-				crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+				jgn::heapRealloc();
+				/*crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
 				selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
 				isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
 					isSelected[i] = false;
 				}
-				selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
+				isdeleted = (bool*)realloc(isdeleted, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
 				for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
 				{
-					selective_render[i] = true;
-				}
+					isdeleted[i] = false;
+				}*/
 
 
 				//	crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
@@ -1994,14 +1935,19 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 				itemscnt++;
 			}
 		}
-		if (itemscnt > 6)
-		{
+		//if (itemscnt > 6)
+		//{
 			HINSTANCE hinst111 = (HINSTANCE)GetWindowLong(mnhwnd, GWLP_HINSTANCE);
 			hWndList = CreateWindow(L"LISTBOX",
 				0, WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_EXTENDEDSEL | WS_VSCROLL,
-				0, 222 - 20 * 6, 250, 20 * 6,
+				0, mainwndsize[1] -90 - 20 * itemscnt, 250, 20 * itemscnt,
 				mnhwnd, NULL, hinst111, NULL);
-		}
+			//hWndList = CreateWindow(L"LISTBOX",
+			//	0, WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_EXTENDEDSEL | WS_VSCROLL,
+			//	0, 222 - 20 * 6, 250, 20 * 6,
+			//	mnhwnd, NULL, hinst111, NULL);
+		//}
+#if !defined(JGN_NO_CMD_HISTORY) 
 		else
 		{
 			/////////////////////////////////////////////
@@ -2014,7 +1960,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 			///////////////////////////////////////////
 
 		}
-
+#endif
 
 
 		ShowWindow(hWndList, SW_HIDE);
@@ -2077,6 +2023,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 						i++;
 					}
 					db = 1;
+					JGN_PostRedisplay();
 
 					goto peintit1;
 				}
@@ -2088,6 +2035,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 			if (itemsel != -1)
 			{
 				SendMessage(hWndList, LB_SETSEL, TRUE, itemsel);
+
 			}
 
 
@@ -2109,6 +2057,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 			{
 				DestroyWindow(hWndList);
 				itemsel = -1;
+				JGN_PostRedisplay();
 			}
 		}
 
@@ -2129,8 +2078,8 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 				endcheck = 1;
 
 
-				//char *test1 = "fopen(";
-				for (i = 0; i < 6; i++)
+				//char *test1 = "script(";
+				for (i = 0; i < 7; i++)
 				{
 					if (test1[5][i] == ttt[i])
 					{
@@ -2142,15 +2091,15 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 
 					}
 				}
-				if (i == 6)
+				if (i == 7)
 				{
 					okrender = 1;
 
-					help = (char*)(ttt + 6);
+					help = (char*)(ttt + 7);
 
 					if (help[0] != '\"')
 					{
-						cout << "expecting a \"" << endl;
+						//std::cout << "expecting a \"" << std::endl;
 						okrender = 0;
 						goto peintit;
 					}
@@ -2170,13 +2119,13 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 					}
 					if (ole1 == 1)
 					{
-						cout << "expecting a \"" << endl;
+						//std::cout << "expecting a \"" << std::endl;
 						okrender = 0;
 						goto peintit;
 					}
 					else
 					{
-						cout << ole << endl;
+						//std::cout << ole << std::endl;
 						help = help - 2 * ole;
 						jgncmdfpath = (char*)malloc(sizeof(char)*(ole + 1));
 
@@ -2191,7 +2140,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 
 						fgets(jgncmdfline, 100, jgncmdfile);
 
-						while ((jgncmdfline[0] != 'e' && jgncmdfline[1] != 'n' && jgncmdfline[2] != 'd'))
+						while ((jgncmdfline[0] != 'e' && jgncmdfline[1] != 'x' && jgncmdfline[2] != 'i' && jgncmdfline[3] != 't'))
 						{
 							for (i = 0; i < 100; i++)
 							{
@@ -2201,9 +2150,67 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 									break;
 								}
 							}
-
-							jgnCommands(ttt, 0);
-							fgets(jgncmdfline, 100, jgncmdfile);
+							if (jgncmdfline[0] == 'f' && jgncmdfline[1] == 'o' && jgncmdfline[2] == 'r')
+							{//now execute the for loop (if there is one)
+								jgn::string curentLine = jgncmdfline;
+								//get rid of the spaces
+								int pos_token = curentLine.find(" ");
+								if (pos_token != std::string::npos)
+								{
+									curentLine.erase(pos_token, 1);
+									pos_token = curentLine.find(" ");
+								}
+								//get rid of the "for"
+								pos_token = curentLine.find("for");
+								curentLine.erase(pos_token, 3);
+								//extract the istart
+								pos_token = curentLine.find(":");
+								int istart = std::stof(curentLine.substr(0, pos_token));
+								//extract the ifin
+								int ifin = std::stof(curentLine.substr(pos_token + 1, curentLine.size() - 1));
+								//extract the starting file pointer
+								fpos_t forBeggining;
+								fgetpos(jgncmdfile, &forBeggining);//this is the line that says "for"
+								//start the actual for loop
+								for (int i = istart; i <= ifin; i++)
+								{
+									fsetpos(jgncmdfile, &forBeggining);
+									fgets(jgncmdfline, 100, jgncmdfile);
+									jgn::string curentLine = jgncmdfline;
+									//std::cout << i << std::endl;
+									while (curentLine.find("endfor") == std::string::npos)
+									{
+										pos_token = curentLine.find("$i");
+										if (pos_token != std::string::npos)
+										{//replace $i
+											char ireplace[10];
+											itoa(i, ireplace, 10);
+											curentLine.replace(pos_token, 2, ireplace);
+										}
+										//erase the spaces at the beggining of the line
+										while (curentLine.c_str()[0] == ' ' || curentLine.c_str()[0] == '\t')
+											curentLine.erase(0, 1);
+										strcpy(jgncmdfline, curentLine.c_str());
+										for (int j = 0; j < 100; j++)
+										{
+											ttt[j] = jgncmdfline[j];
+											if (jgncmdfline[j] == 0)
+											{
+												break;
+											}
+										}
+										//std::wcout << ttt << std::endl;
+										jgnCommands(ttt, 0);
+										fgets(jgncmdfline, 100, jgncmdfile);
+										curentLine = jgncmdfline;
+									}
+								}
+							}
+							else
+							{
+								jgnCommands(ttt, 0);
+								fgets(jgncmdfline, 100, jgncmdfile);
+							}
 
 						}
 						fclose(jgncmdfile);
@@ -2239,12 +2246,16 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 
 				if (okrender)
 				{
-					SendMessage(CommandTextHistory, EM_SETREADONLY, FALSE, NULL);
+#if !defined(JGN_NO_CMD_HISTORY) 
 
+					SendMessage(CommandTextHistory, EM_SETREADONLY, FALSE, NULL);
+#endif
 					okrender = 0;
 
+#if !defined(JGN_NO_CMD_HISTORY) 
 					SendMessage(CommandTextHistory, EM_SETSEL, 0, -1);
 					SendMessage(CommandTextHistory, EM_SETSEL, -1, 0);
+#endif
 
 					for (i = 0; i < 50; i++)
 					{
@@ -2259,19 +2270,25 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 							{
 								i = 100;
 							}
+#if !defined(JGN_NO_CMD_HISTORY) 
 							else
 							{
 								SendMessage(CommandTextHistory, WM_CHAR, (TCHAR)ttt[i], 0);
 
 
 							}
+#endif
 						}
 					}
+#if !defined(JGN_NO_CMD_HISTORY) 
 
 					SendMessage(CommandTextHistory, WM_CHAR, (TCHAR)ucender[0], 0);
-
+#endif
 					SetFocus(CommandTextField);
+
+#if !defined(JGN_NO_CMD_HISTORY) 
 					SendMessage(CommandTextHistory, EM_SETREADONLY, TRUE, NULL);
+#endif
 
 					for (i = 0; i < 50; i++)
 					{
@@ -2334,7 +2351,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 //
 //Tray
 //
-HWND JGN_CreateTray(string traytitle, HINSTANCE hInstance)
+HWND JGN_CreateTray(std::string traytitle, HINSTANCE hInstance)
 {
 	// prepare for XP style controls
 	InitCommonControls();
@@ -2731,7 +2748,9 @@ void jgnCommands(LPTSTR ttt, int d)
 		CustomSurfacesCount++;
 
 		CustomSurfaces = (float**)realloc(CustomSurfaces, sizeof(float*)*CustomSurfacesCount);
+		CustomSurfaces_hkl = (int**)realloc(CustomSurfaces, sizeof(float*)*CustomSurfacesCount);
 		CustomSurfaces[CustomSurfacesCount - 1] = (float*)malloc(sizeof(float) * 4);
+		CustomSurfaces_hkl[CustomSurfacesCount - 1] = (int*)malloc(sizeof(float) * 3);
 		CustomSurfaces[CustomSurfacesCount - 1][0] = 0;
 		CustomSurfaces[CustomSurfacesCount - 1][1] = 0;
 		CustomSurfaces[CustomSurfacesCount - 1][2] = 0;
@@ -2941,7 +2960,7 @@ void jgnCommands(LPTSTR ttt, int d)
 		okrender = 1;
 		help = (char*)(ttt + 7);
 
-		jgn::string option = LPTSTR2string((LPTSTR)help, ')', 2);
+		jgn::string option = jgn::LPTSTR2string((LPTSTR)help, ')', 2);
 
 		if (option == "on")
 		{
@@ -2959,9 +2978,10 @@ void jgnCommands(LPTSTR ttt, int d)
 		goto peintit;
 
 	}
-	//"rand("
-	for (i = 0; i < 5; i++)
+	//"phonon("
+	for (i = 0; i < 7; i++)
 	{
+
 		if (test1[8][i] == ttt[i])
 		{
 
@@ -2971,29 +2991,39 @@ void jgnCommands(LPTSTR ttt, int d)
 			i = 100;
 		}
 	}
-	if (i == 5)
+	if (i == 7)
 	{
 		okrender = 1;
 
 		float r = 0;
 
-		help = (char*)(ttt + 5);
+		help = (char*)(ttt + 7);
 
-		jgn::string rstr = LPTSTR2string((LPTSTR)help, ')');
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
 
 		if (rstr.isnumber())
 		{
 			ole = t * sized[0] * sized[1] * sized[2];
 
 			r = stof(rstr);
-			srand(time(NULL));
-#pragma omp parallel for firstprivate(ole, r)
-			for (int ole1 = 0; ole1 < ole; ole1++)
+			srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+			for (int g = 0; g < vs.N_groups; g++)
 			{
-				crystal[2 + 5 * ole1] += r * (2 * (rand() / (float)RAND_MAX) - 1);
-				crystal[3 + 5 * ole1] += r * (2 * (rand() / (float)RAND_MAX) - 1);
-				crystal[4 + 5 * ole1] += r * (2 * (rand() / (float)RAND_MAX) - 1);
+				for (int i = 0; i < vs.group[g].N_atoms; i++)
+				{
+					vs.group[g].position[i].x = vs.group[g].position[i].x + r * (2 * (rand() / (float)RAND_MAX) - 1);
+					vs.group[g].position[i].y = vs.group[g].position[i].y + r * (2 * (rand() / (float)RAND_MAX) - 1);
+					vs.group[g].position[i].z = vs.group[g].position[i].z + r * (2 * (rand() / (float)RAND_MAX) - 1);
+				}
 			}
+//#pragma omp parallel for firstprivate(ole, r)
+//			for (int ole1 = 0; ole1 < ole; ole1++)
+//			{
+//				
+//				crystal[2 + 5 * ole1] += r * (2 * (rand() / (float)RAND_MAX) - 1);
+//				crystal[3 + 5 * ole1] += r * (2 * (rand() / (float)RAND_MAX) - 1);
+//				crystal[4 + 5 * ole1] += r * (2 * (rand() / (float)RAND_MAX) - 1);
+//			}
 		}
 		else
 		{
@@ -3004,8 +3034,44 @@ void jgnCommands(LPTSTR ttt, int d)
 		goto peintit;
 
 	}
-	//"Plane("
-	for (i = 0; i < 6; i++)
+	//"cut("
+	bool cont = true;
+	int Nnumbs = 0;//count 3 numbers
+	int ibuff = 0;
+	char buffer[10];
+	int iintbuff = 0;
+	int intbuff[3];
+	i = 6;
+	j = 0;
+	while (Nnumbs!=3)
+	{
+		if (isdigit(ttt[j]) )
+		{
+			Nnumbs++;
+			buffer[ibuff] = ttt[j];
+			buffer[ibuff + 1] = '\0';
+
+			intbuff[iintbuff] = atoi(buffer);
+			iintbuff++;
+			ibuff = 0;
+			j++;
+		}
+		else if (ttt[j] == '-')
+		{
+			buffer[ibuff] = ttt[j];
+			ibuff++;
+			j++;
+		}
+		else
+		{
+			Nnumbs = 3;
+			i = 0;
+		}
+	}
+
+
+#if defined(JGN_CMD_PLANE) 
+	for (i = 0; i < 4; i++)
 	{
 		if (test1[4][i] == ttt[i])
 		{
@@ -3016,22 +3082,28 @@ void jgnCommands(LPTSTR ttt, int d)
 			i = 100;
 		}
 	}
-	if (i == 6)
+#endif
+	if (i == 4)
 	{
 
 		okrender = 1;
 		CustomSurfacesCount++;
 
 		CustomSurfaces = (float**)realloc(CustomSurfaces, sizeof(float*)*CustomSurfacesCount);
+		CustomSurfaces_hkl = (int**)realloc(CustomSurfaces_hkl, sizeof(int*)*CustomSurfacesCount);
 		CustomSurfaces[CustomSurfacesCount - 1] = (float*)malloc(sizeof(float) * 4);
+		CustomSurfaces_hkl[CustomSurfacesCount - 1] = (int*)malloc(sizeof(int) * 3);
 		CustomSurfaces[CustomSurfacesCount - 1][0] = 0;
 		CustomSurfaces[CustomSurfacesCount - 1][1] = 0;
 		CustomSurfaces[CustomSurfacesCount - 1][2] = 0;
 		CustomSurfaces[CustomSurfacesCount - 1][3] = 0;
+
+
+#if defined(JGN_CMD_PLANE)
 		crystalh = 0;
 		crystalk = 0;
 		crystall = 0;
-		help = (char*)(ttt + 6);
+		help = (char*)(ttt + 4);
 		if (help[0] >= 48 && help[0] <= 57)
 		{
 			crystalh = help[0] - 48;
@@ -3156,6 +3228,11 @@ void jgnCommands(LPTSTR ttt, int d)
 			crystall = -crystall;
 		}
 
+#endif
+		CustomSurfaces_hkl[CustomSurfacesCount - 1][0] = crystalh;
+		CustomSurfaces_hkl[CustomSurfacesCount - 1][1] = crystalk;
+		CustomSurfaces_hkl[CustomSurfacesCount - 1][2] = crystall;
+
 		if (crystalh == 0)
 		{
 			if (crystalk == 0)
@@ -3168,9 +3245,9 @@ void jgnCommands(LPTSTR ttt, int d)
 				}
 				else//00l ok
 				{
-					CustomSurfaces[CustomSurfacesCount - 1][0] = ijk[0][1] * ijk[1][2] - ijk[0][2] * ijk[1][1];
-					CustomSurfaces[CustomSurfacesCount - 1][1] = -ijk[0][0] * ijk[1][2] + ijk[0][2] * ijk[1][0];
-					CustomSurfaces[CustomSurfacesCount - 1][2] = ijk[0][0] * ijk[1][1] - ijk[0][1] * ijk[1][0];
+					CustomSurfaces[CustomSurfacesCount - 1][0] = vs.group[vs._isimulationBox].primitiveVec[0].y * vs.group[vs._isimulationBox].primitiveVec[1].z - vs.group[vs._isimulationBox].primitiveVec[0].z * vs.group[vs._isimulationBox].primitiveVec[1].y;
+					CustomSurfaces[CustomSurfacesCount - 1][1] = -vs.group[vs._isimulationBox].primitiveVec[0].x * vs.group[vs._isimulationBox].primitiveVec[1].z + vs.group[vs._isimulationBox].primitiveVec[0].z * vs.group[vs._isimulationBox].primitiveVec[1].x;
+					CustomSurfaces[CustomSurfacesCount - 1][2] = vs.group[vs._isimulationBox].primitiveVec[0].x * vs.group[vs._isimulationBox].primitiveVec[1].y - vs.group[vs._isimulationBox].primitiveVec[0].y * vs.group[vs._isimulationBox].primitiveVec[1].x;
 
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = crystall * CustomSurfaces[CustomSurfacesCount - 1][0];
@@ -3183,9 +3260,9 @@ void jgnCommands(LPTSTR ttt, int d)
 			{
 				if (crystall == 0)//0k0 ok
 				{
-					CustomSurfaces[CustomSurfacesCount - 1][0] = -ijk[0][1] * ijk[2][2] + ijk[0][2] * ijk[2][1];
-					CustomSurfaces[CustomSurfacesCount - 1][1] = ijk[0][0] * ijk[2][2] - ijk[0][2] * ijk[2][0];
-					CustomSurfaces[CustomSurfacesCount - 1][2] = -ijk[0][0] * ijk[2][1] + ijk[0][1] * ijk[2][0];
+					CustomSurfaces[CustomSurfacesCount - 1][0] = -vs.group[vs._isimulationBox].primitiveVec[0].y * vs.group[vs._isimulationBox].primitiveVec[2].z + vs.group[vs._isimulationBox].primitiveVec[0].z * vs.group[vs._isimulationBox].primitiveVec[2].y;
+					CustomSurfaces[CustomSurfacesCount - 1][1] = vs.group[vs._isimulationBox].primitiveVec[0].x * vs.group[vs._isimulationBox].primitiveVec[2].z - vs.group[vs._isimulationBox].primitiveVec[0].z * vs.group[vs._isimulationBox].primitiveVec[2].x;
+					CustomSurfaces[CustomSurfacesCount - 1][2] = -vs.group[vs._isimulationBox].primitiveVec[0].x * vs.group[vs._isimulationBox].primitiveVec[2].y + vs.group[vs._isimulationBox].primitiveVec[0].y * vs.group[vs._isimulationBox].primitiveVec[2].x;
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = crystalk * CustomSurfaces[CustomSurfacesCount - 1][0];
 					CustomSurfaces[CustomSurfacesCount - 1][1] = crystalk * CustomSurfaces[CustomSurfacesCount - 1][1];
@@ -3194,9 +3271,10 @@ void jgnCommands(LPTSTR ttt, int d)
 				}
 				else//0kl ok
 				{
-					CustomSurfaces[CustomSurfacesCount - 1][0] = ijk[0][1] * (ijk[1][2] / crystalk - ijk[2][2] / crystall) - ijk[0][2] * (ijk[1][1] / crystalk - ijk[2][1] / crystall);
-					CustomSurfaces[CustomSurfacesCount - 1][1] = -ijk[0][0] * (ijk[1][2] / crystalk - ijk[2][2] / crystall) + ijk[0][2] * (ijk[1][0] / crystalk - ijk[2][0] / crystall);
-					CustomSurfaces[CustomSurfacesCount - 1][2] = ijk[0][0] * (ijk[1][1] / crystalk - ijk[2][1] / crystall) - ijk[0][1] * (ijk[1][0] / crystalk - ijk[2][0] / crystall);
+					CustomSurfaces[CustomSurfacesCount - 1][0] = vs.group[vs._isimulationBox].primitiveVec[0].y * (vs.group[vs._isimulationBox].primitiveVec[1].z / crystalk - vs.group[vs._isimulationBox].primitiveVec[2].z / crystall) - vs.group[vs._isimulationBox].primitiveVec[0].z * (vs.group[vs._isimulationBox].primitiveVec[1].y / crystalk - vs.group[vs._isimulationBox].primitiveVec[2].y / crystall);
+					CustomSurfaces[CustomSurfacesCount - 1][1] = -vs.group[vs._isimulationBox].primitiveVec[0].x * (vs.group[vs._isimulationBox].primitiveVec[1].z / crystalk - vs.group[vs._isimulationBox].primitiveVec[2].z / crystall) + vs.group[vs._isimulationBox].primitiveVec[0].z * (vs.group[vs._isimulationBox].primitiveVec[1].x / crystalk - vs.group[vs._isimulationBox].primitiveVec[2].x / crystall);
+					CustomSurfaces[CustomSurfacesCount - 1][2] = vs.group[vs._isimulationBox].primitiveVec[0].x * (vs.group[vs._isimulationBox].primitiveVec[1].y / crystalk - vs.group[vs._isimulationBox].primitiveVec[2].y / crystall) - vs.group[vs._isimulationBox].primitiveVec[0].y * (vs.group[vs._isimulationBox].primitiveVec[1].x / crystalk - vs.group[vs._isimulationBox].primitiveVec[2].x / crystall);
+
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = crystalk * crystall*CustomSurfaces[CustomSurfacesCount - 1][0];
 					CustomSurfaces[CustomSurfacesCount - 1][1] = crystalk * crystall*CustomSurfaces[CustomSurfacesCount - 1][1];
@@ -3210,9 +3288,9 @@ void jgnCommands(LPTSTR ttt, int d)
 			{
 				if (crystall == 0)//h00 ok
 				{
-					CustomSurfaces[CustomSurfacesCount - 1][0] = ijk[1][1] * ijk[2][2] - ijk[1][2] * ijk[2][1];
-					CustomSurfaces[CustomSurfacesCount - 1][1] = -ijk[1][0] * ijk[2][2] + ijk[1][2] * ijk[2][0];
-					CustomSurfaces[CustomSurfacesCount - 1][2] = ijk[1][0] * ijk[2][1] - ijk[1][1] * ijk[2][0];
+					CustomSurfaces[CustomSurfacesCount - 1][0] = vs.group[vs._isimulationBox].primitiveVec[1].y * vs.group[vs._isimulationBox].primitiveVec[2].z - vs.group[vs._isimulationBox].primitiveVec[1].z * vs.group[vs._isimulationBox].primitiveVec[2].y;
+					CustomSurfaces[CustomSurfacesCount - 1][1] = -vs.group[vs._isimulationBox].primitiveVec[1].x * vs.group[vs._isimulationBox].primitiveVec[2].z + vs.group[vs._isimulationBox].primitiveVec[1].z * vs.group[vs._isimulationBox].primitiveVec[2].x;
+					CustomSurfaces[CustomSurfacesCount - 1][2] = vs.group[vs._isimulationBox].primitiveVec[1].x * vs.group[vs._isimulationBox].primitiveVec[2].y - vs.group[vs._isimulationBox].primitiveVec[1].y * vs.group[vs._isimulationBox].primitiveVec[2].x;
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = crystalh * CustomSurfaces[CustomSurfacesCount - 1][0];
 					CustomSurfaces[CustomSurfacesCount - 1][1] = crystalh * CustomSurfaces[CustomSurfacesCount - 1][1];
@@ -3223,9 +3301,9 @@ void jgnCommands(LPTSTR ttt, int d)
 				{
 
 
-					CustomSurfaces[CustomSurfacesCount - 1][0] = ijk[1][1] * (ijk[0][2] / crystalh - ijk[2][2] / crystall) - ijk[1][2] * (ijk[0][1] / crystalh - ijk[2][1] / crystall);
-					CustomSurfaces[CustomSurfacesCount - 1][1] = -ijk[1][0] * (ijk[0][2] / crystalh - ijk[2][2] / crystall) + ijk[1][2] * (ijk[0][0] / crystalh - ijk[2][0] / crystall);
-					CustomSurfaces[CustomSurfacesCount - 1][2] = ijk[1][0] * (ijk[0][1] / crystalh - ijk[2][1] / crystall) - ijk[1][1] * (ijk[0][0] / crystalh - ijk[2][0] / crystall);
+					CustomSurfaces[CustomSurfacesCount - 1][0] = vs.group[vs._isimulationBox].primitiveVec[1].y * (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].z / crystall) - vs.group[vs._isimulationBox].primitiveVec[1].z * (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].y / crystall);
+					CustomSurfaces[CustomSurfacesCount - 1][1] = -vs.group[vs._isimulationBox].primitiveVec[1].x * (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].z / crystall) + vs.group[vs._isimulationBox].primitiveVec[1].z * (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].x / crystall);
+					CustomSurfaces[CustomSurfacesCount - 1][2] = vs.group[vs._isimulationBox].primitiveVec[1].x * (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].y / crystall) - vs.group[vs._isimulationBox].primitiveVec[1].y * (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].x / crystall);
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = -crystalh * crystall*CustomSurfaces[CustomSurfacesCount - 1][0];
 					CustomSurfaces[CustomSurfacesCount - 1][1] = -crystalh * crystall*CustomSurfaces[CustomSurfacesCount - 1][1];
@@ -3238,9 +3316,9 @@ void jgnCommands(LPTSTR ttt, int d)
 			{
 				if (crystall == 0)//hk0 ok
 				{
-					CustomSurfaces[CustomSurfacesCount - 1][0] = ijk[2][1] * (ijk[0][2] / crystalh - ijk[1][2] / crystalk) - ijk[2][2] * (ijk[0][1] / crystalh - ijk[1][1] / crystalk);
-					CustomSurfaces[CustomSurfacesCount - 1][1] = -ijk[2][0] * (ijk[0][2] / crystalh - ijk[1][2] / crystalk) + ijk[2][2] * (ijk[0][0] / crystalh - ijk[1][0] / crystalk);
-					CustomSurfaces[CustomSurfacesCount - 1][2] = ijk[2][0] * (ijk[0][1] / crystalh - ijk[1][1] / crystalk) - ijk[2][1] * (ijk[0][0] / crystalh - ijk[1][0] / crystalk);
+					CustomSurfaces[CustomSurfacesCount - 1][0] = vs.group[vs._isimulationBox].primitiveVec[2].y * (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].z / crystalk) - vs.group[vs._isimulationBox].primitiveVec[2].z * (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].y / crystalk);
+					CustomSurfaces[CustomSurfacesCount - 1][1] = -vs.group[vs._isimulationBox].primitiveVec[2].x * (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].z / crystalk) + vs.group[vs._isimulationBox].primitiveVec[2].z * (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].x / crystalk);
+					CustomSurfaces[CustomSurfacesCount - 1][2] = vs.group[vs._isimulationBox].primitiveVec[2].x * (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].y / crystalk) - vs.group[vs._isimulationBox].primitiveVec[2].y * (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].x / crystalk);
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = crystalk * crystalh*CustomSurfaces[CustomSurfacesCount - 1][0];
 					CustomSurfaces[CustomSurfacesCount - 1][1] = crystalk * crystalh*CustomSurfaces[CustomSurfacesCount - 1][1];
@@ -3248,17 +3326,58 @@ void jgnCommands(LPTSTR ttt, int d)
 				}
 				else//hkl
 				{
-					CustomSurfaces[CustomSurfacesCount - 1][0] = (ijk[0][1] / crystalh - ijk[2][1] / crystall) * (ijk[0][2] / crystalh - ijk[1][2] / crystalk) - (ijk[0][2] / crystalh - ijk[2][2] / crystall) * (ijk[0][1] / crystalh - ijk[1][1] / crystalk);
-					CustomSurfaces[CustomSurfacesCount - 1][1] = -(ijk[0][0] / crystalh - ijk[2][0] / crystall) * (ijk[0][2] / crystalh - ijk[1][2] / crystalk) + (ijk[0][2] / crystalh - ijk[2][2] / crystall) * (ijk[0][0] / crystalh - ijk[1][0] / crystalk);
-					CustomSurfaces[CustomSurfacesCount - 1][2] = (ijk[0][0] / crystalh - ijk[2][0] / crystall) * (ijk[0][1] / crystalh - ijk[1][1] / crystalk) - (ijk[0][1] / crystalh - ijk[2][1] / crystall) * (ijk[0][0] / crystalh - ijk[1][0] / crystalk);
+					CustomSurfaces[CustomSurfacesCount - 1][0] = (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].y / crystall) * (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].z / crystalk) - (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].z / crystall) * (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].y / crystalk);
+					CustomSurfaces[CustomSurfacesCount - 1][1] = -(vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].x / crystall) * (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].z / crystalk) + (vs.group[vs._isimulationBox].primitiveVec[0].z / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].z / crystall) * (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].x / crystalk);
+					CustomSurfaces[CustomSurfacesCount - 1][2] = (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].x / crystall) * (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].y / crystalk) - (vs.group[vs._isimulationBox].primitiveVec[0].y / crystalh - vs.group[vs._isimulationBox].primitiveVec[2].y / crystall) * (vs.group[vs._isimulationBox].primitiveVec[0].x / crystalh - vs.group[vs._isimulationBox].primitiveVec[1].x / crystalk);
 
 					CustomSurfaces[CustomSurfacesCount - 1][0] = -crystall * crystalk*crystalh*CustomSurfaces[CustomSurfacesCount - 1][0];
 					CustomSurfaces[CustomSurfacesCount - 1][1] = -crystall * crystalk*crystalh*CustomSurfaces[CustomSurfacesCount - 1][1];
 					CustomSurfaces[CustomSurfacesCount - 1][2] = -crystall * crystalk*crystalh*CustomSurfaces[CustomSurfacesCount - 1][2];
 
+
+
 				}
 			}
 		}
+
+		
+		/*jgn::vec3 p1 = vs.group[vs._isimulationBox].primitiveVec[0];
+		std::cout << p1 << std::endl;
+		if (crystalh == 0) {
+			p1 = p1 * crystalh;
+		}
+		else
+		{
+			p1 = p1 * (1.f / crystalh);
+		}
+		jgn::vec3 p2 = vs.group[vs._isimulationBox].primitiveVec[1];
+		std::cout << p2 << std::endl;
+		if (crystalk == 0) {
+			p2 = p2 * crystalk;
+		}
+		else
+		{
+			p2 = p2 * (1.f / crystalk);
+		}
+		jgn::vec3 p3 = vs.group[vs._isimulationBox].primitiveVec[2];
+		std::cout << p3 << std::endl;
+		if (crystall == 0) {
+			p3 = p3 * crystall;
+		}
+		else
+		{
+			p3 = p3 * (1.f / crystall);
+		}
+		jgn::vec3 p12 = p2 - p1;
+		jgn::vec3 p13 = p3 - p1;
+
+		CustomSurfaces[CustomSurfacesCount - 1][0] = p12.y * p13.z - p12.z * p13.y;
+		CustomSurfaces[CustomSurfacesCount - 1][1] = p12.z * p13.x - p12.x * p13.z;
+		CustomSurfaces[CustomSurfacesCount - 1][2] = p12.x * p13.y - p12.y * p13.x;*/
+
+		//CustomSurfaces[CustomSurfacesCount - 1][0] = CustomSurfaces[CustomSurfacesCount - 1][0] * vs.group[vs._isimulationBox].primitiveVec[0].abs();
+		//CustomSurfaces[CustomSurfacesCount - 1][1] = CustomSurfaces[CustomSurfacesCount - 1][1] * vs.group[vs._isimulationBox].primitiveVec[1].abs();
+		//CustomSurfaces[CustomSurfacesCount - 1][2] = CustomSurfaces[CustomSurfacesCount - 1][2] * vs.group[vs._isimulationBox].primitiveVec[2].abs();
 
 
 
@@ -3349,6 +3468,7 @@ void jgnCommands(LPTSTR ttt, int d)
 		CustomSurfaces[CustomSurfacesCount - 1][1] = CustomSurfaces[CustomSurfacesCount - 1][1] / sqrt(pow(helping1, 2) + pow(helping2, 2) + pow(helping3, 2));
 		CustomSurfaces[CustomSurfacesCount - 1][2] = CustomSurfaces[CustomSurfacesCount - 1][2] / sqrt(pow(helping1, 2) + pow(helping2, 2) + pow(helping3, 2));
 
+		//std::cout << CustomSurfaces[CustomSurfacesCount - 1][0] << " " << CustomSurfaces[CustomSurfacesCount - 1][1] << " " << CustomSurfaces[CustomSurfacesCount - 1][2] << std::endl;
 		help += 2;
 		isngtv = 0;
 
@@ -3391,11 +3511,12 @@ void jgnCommands(LPTSTR ttt, int d)
 		help += 2;
 		isngtv = 0;
 
-
 		if (okrender == 0)
 		{
 			CustomSurfacesCount--;
 		}
+
+
 
 		goto peintit;
 
@@ -3404,199 +3525,6 @@ void jgnCommands(LPTSTR ttt, int d)
 
 
 
-	//"PlaneH("
-	/*for (i = 0; i < 7; i++)
-	{
-	if (test5[i] == ttt[i])
-	{
-
-	}
-	else
-	{
-	i = 100;
-	}
-	}
-	if (i == 7)
-	{
-	okrender = 1;
-	CustomSurfacesCount++;
-
-	CustomSurfaces = (float**)realloc(CustomSurfaces, sizeof(float*)*CustomSurfacesCount);
-	CustomSurfaces[CustomSurfacesCount - 1] = (float*)malloc(sizeof(float) * 4);
-	CustomSurfaces[CustomSurfacesCount - 1][0] = 0;
-	CustomSurfaces[CustomSurfacesCount - 1][1] = 0;
-	CustomSurfaces[CustomSurfacesCount - 1][2] = 0;
-	CustomSurfaces[CustomSurfacesCount - 1][3] = 0;
-
-	int u = 0;
-	int v = 0;
-
-	help = (char*)(ttt + 7);
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	u = help[0] - 48;
-	}
-	else if (help[0] == '-')
-	{
-	isngtv = 1;
-	}
-	else
-	{
-	okrender = 0;
-	}
-	help = help + 2;
-	loop = 0;
-	while (help[0] != ',' && loop<6)
-	{
-	loop++;
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	u = 10 * u + help[0] - 48;
-	help += 2;
-	}
-	else
-	{
-	okrender = 0;
-
-
-	}
-	}
-	loop = 0;
-	if (isngtv)
-	{
-	u = -u;
-	}
-	help += 2;
-	isngtv = 0;
-
-
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	v = help[0] - 48;
-	}
-	else if (help[0] == '-')
-	{
-	isngtv = 1;
-	}
-	else
-	{
-	okrender = 0;
-
-	}
-	help = help + 2;
-	while (help[0] != ',' && loop<6)
-
-	{
-	loop++;
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	v = 10 * v + help[0] - 48;
-	help += 2;
-	}
-	else
-	{
-	okrender = 0;
-
-
-	}
-	}
-	loop = 0;
-	if (isngtv)
-	{
-	v = -v;
-	}
-	help += 2;
-	isngtv = 0;
-
-	CustomSurfaces[CustomSurfacesCount - 1][0] = u;
-	CustomSurfaces[CustomSurfacesCount - 1][1] = u/sqrt(3) + v*2.0 / sqrt(3);
-
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	CustomSurfaces[CustomSurfacesCount - 1][2] = help[0] - 48;
-	}
-	else if (help[0] == '-')
-	{
-	isngtv = 1;
-	}
-	else
-	{
-	okrender = 0;
-
-	}
-	help = help + 2;
-	while (help[0] != ',' && loop<6)
-
-	{
-	loop++;
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	CustomSurfaces[CustomSurfacesCount - 1][2] = 10 * CustomSurfaces[CustomSurfacesCount - 1][2] + help[0] - 48;
-	help += 2;
-	}
-	else
-	{
-	okrender = 0;
-
-	}
-	}
-	loop = 0;
-	if (isngtv)
-	{
-	CustomSurfaces[CustomSurfacesCount - 1][2] = -CustomSurfaces[CustomSurfacesCount - 1][2];
-	}
-	help += 2;
-	isngtv = 0;
-
-
-
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	CustomSurfaces[CustomSurfacesCount - 1][3] = help[0] - 48;
-	}
-	else if (help[0] == '-')
-	{
-	isngtv = 1;
-	}
-	else
-	{
-	okrender = 0;
-
-	}
-	help = help + 2;
-	while (help[0] != ')' && loop<6)
-
-	{
-	loop++;
-	if (help[0] >= 48 && help[0] <= 57)
-	{
-	CustomSurfaces[CustomSurfacesCount - 1][3] = 10 * CustomSurfaces[CustomSurfacesCount - 1][3] + help[0] - 48;
-	help += 2;
-	}
-	else
-	{
-	okrender = 0;
-
-	}
-	}
-	loop = 0;
-	if (isngtv)
-	{
-	CustomSurfaces[CustomSurfacesCount - 1][3] = -CustomSurfaces[CustomSurfacesCount - 1][3];
-	}
-	help += 2;
-	isngtv = 0;
-
-
-	if (okrender == 0)
-	{
-	CustomSurfacesCount--;
-	}
-	JGN_PostRedisplay();
-
-	goto peintit;
-
-	}*/
 
 
 
@@ -3718,6 +3646,7 @@ void jgnCommands(LPTSTR ttt, int d)
 	if (i == 10)
 	{
 		okrender = 1;
+		tb._sellectedfordistance[1].y = -1;
 		help = (char*)(ttt + 10);
 		if (help[0] >= 48 && help[0] <= 57)
 		{
@@ -3845,100 +3774,686 @@ void jgnCommands(LPTSTR ttt, int d)
 			}
 			//periodic_table = fopen("periodic_table.jgn", "r");
 
-			crystal = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
-			crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
-			selective_dynamics = (char*)realloc(selective_dynamics, sizeof(char)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 3));
-			isSelected = (bool*)realloc(isSelected, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
-			for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
-			{
-				isSelected[i] = false;
-			}
-			selective_render = (bool*)realloc(selective_render, sizeof(bool)*t*sized[0] * sized[1] * sized[2]);
-			for (int i = 0; i < t*sized[0] * sized[1] * sized[2]; i++)
-			{
-				selective_render[i] = true;
-			}
-
-
-			//	crystal_backup = (float*)realloc(NULL, sizeof(float)*(jgn_supercell_xyz[0] * jgn_supercell_xyz[1] * jgn_supercell_xyz[2] * t * 5));
+			//jgn::heapRealloc();
 			//double ttest = omp_get_wtime();
+			int sx = sized[0];
+			int sy = sized[1];
+			int sz = sized[2];
+								
+			vs.N_atoms = sx * sy * sz * vs.original->N_atoms;
+			vs.reserve(sx, sy, sz);
 
-#pragma omp parallel for firstprivate(jgn_supercell_xyz, xexe, my_direct, inptype, uccartesian, ijk, t)
-			for (int ole3 = 0; ole3 < t; ole3++) {//for every atom in the unit cell
-				for (int ole4 = -jgn_supercell_xyz[2] / 2; ole4 < jgn_supercell_xyz[2] / 2 + xexe[2]; ole4++) {
-					for (int ole2 = -jgn_supercell_xyz[1] / 2; ole2 < jgn_supercell_xyz[1] / 2 + xexe[1]; ole2++) {
-						for (int ole = -jgn_supercell_xyz[0] / 2; ole < jgn_supercell_xyz[0] / 2 + xexe[0]; ole++) {
+			/*std::cout << vs.group[0].position[0]			<<  std::endl;
+			std::cout << vs.group[0].type[0]				<<  std::endl;
+			std::cout << vs.group[0].selective_dynamics[0] 	<<  std::endl;
+			std::cout << vs.group[0].color[0] 				<<  std::endl;
+			std::cout << vs.group[0].number[0] 				<<  std::endl;
+			std::cout << vs.group[0].weight[0] 				<<  std::endl;
+			std::cout << vs.group[0].radius[0] 				<<  std::endl;
+			std::cout << vs.group[0].isSelected[0] 			<<  std::endl;
+			std::cout << vs.group[0].isdeleted[0] 			<<  std::endl;
+			std::cout << vs.group[0].iscut[0] 				<<  std::endl;*/
 
-							crystal[0 + 5 * (ole3 + t * (ole4 + jgn_supercell_xyz[2] / 2 + jgn_supercell_xyz[2] * (ole2 + jgn_supercell_xyz[1] / 2 + jgn_supercell_xyz[1] * (ole + jgn_supercell_xyz[0] / 2))))] = my_direct[0 + 5 * ole3];//atomikos ari8mos
-						//	crystal_backup[0 + 5 * (ole3 + t*(ole4 + jgn_supercell_xyz[2] / 2 + jgn_supercell_xyz[2] * (ole2 + jgn_supercell_xyz[1] / 2 + jgn_supercell_xyz[1] * (ole + jgn_supercell_xyz[0] / 2))))] = my_direct[0 + 5 * ole3];//atomikos ari8mos
-						//selective dynamics
-							selective_dynamics[0 + 3 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] = selective_dynamics[0 + 3 * (ole3)];
-							selective_dynamics[1 + 3 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] = selective_dynamics[1 + 3 * (ole3)];
-							selective_dynamics[2 + 3 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] = selective_dynamics[2 + 3 * (ole3)];
-
-							crystal[1 + 5 * (ole3 + t * (ole4 + jgn_supercell_xyz[2] / 2 + jgn_supercell_xyz[2] * (ole2 + jgn_supercell_xyz[1] / 2 + jgn_supercell_xyz[1] * (ole + jgn_supercell_xyz[0] / 2))))] = my_direct[1 + 5 * ole3];//atomiko varos
-						//	crystal_backup[1 + 5 * (ole3 + t*(ole4 + jgn_supercell_xyz[2] / 2 + jgn_supercell_xyz[2] * (ole2 + jgn_supercell_xyz[1] / 2 + jgn_supercell_xyz[1] * (ole + jgn_supercell_xyz[0] / 2))))] = my_direct[1 + 5 * ole3];//atomiko varos
-							if (inptype == 'd')
-							{
-								//crystal[ole + sized[0] / 2][ole2 + sized[1] / 2][ole4 + sized[2] / 2][ole3][1] = direct[1+5*ole3];
-								for (int ole1 = 0; ole1 < 3; ole1++) {
-									crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] = uccartesian[ole1 + 3 * ole3] + ole * ijk[0][ole1] + ole2 * ijk[1][ole1] + ole4 * ijk[2][ole1];//cartesians
-									crystal_backup[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] = uccartesian[ole1 + 3 * ole3] + ole * ijk[0][ole1] + ole2 * ijk[1][ole1] + ole4 * ijk[2][ole1];//cartesians
-
-									//if (crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] < min_xyz[ole1])
-									//{
-									//	min_xyz[ole1] = crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))];
-
-									//}
-									//if (crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] > max_xyz[ole1])
-									//{
-									//	max_xyz[ole1] = crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))];
-
-									//}
-
-								}
-
+			int as = 0;//atom position starts at
+			for (int g = 0; g < vs.N_groups; g++)
+			{//for every group
+				for (int k = 0; k < sz; k++)
+				{
+					for (int j = 0; j < sy; j++)
+					{
+						for (int i = 0; i < sx; i++)
+						{
+							for (int a = 0; a < vs.original->group[g].N_atoms; a++)
+							{//for every atom within the group
+								//std::cout << g << " " << k << " " << j << " " << i << " " << a << std::endl;
+								vs.group[g].position[a + as] = vs.original->group[g].position[a] +vs.original->group[vs._isimulationBox].primitiveVec[0] * i + vs.original->group[vs._isimulationBox].primitiveVec[1] * j + vs.original->group[vs._isimulationBox].primitiveVec[2] * k;
+								vs.group[g].type[a + as] = vs.original->group[g].type[a];
+								vs.group[g].selective_dynamics[a + as] = vs.original->group[g].selective_dynamics[a];
+								vs.group[g].color[a + as] = vs.original->group[g].color[a];
+								vs.group[g].number[a + as] = vs.original->group[g].number[a];
+								vs.group[g].weight[a + as] = vs.original->group[g].weight[a];
+								vs.group[g].radius[a + as] = vs.original->group[g].radius[a];
+								vs.group[g].isSelected[a + as] = vs.original->group[g].isSelected[a];
+								vs.group[g].isdeleted[a + as] = vs.original->group[g].isdeleted[a];
+								vs.group[g].iscut[a + as] = vs.original->group[g].iscut[a];
 							}
-							else if (inptype == 'c')
-							{
-								float oleh[3] = { ole,ole2,ole4 };
-								for (ole1 = 0; ole1 < 3; ole1++) {
-									if (oleh[ole1] >= 0)
-										oleh[ole1]++;
-									crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + jgn_supercell_xyz[2] / 2 + jgn_supercell_xyz[2] * (ole2 + jgn_supercell_xyz[1] / 2 + jgn_supercell_xyz[1] * (ole + jgn_supercell_xyz[0] / 2))))] = my_direct[ole1 + 2 + 5 * (ole3)] + ole * ijk[0][ole1] + ole2 * ijk[1][ole1] + ole4 * ijk[2][ole1];//cartesians
-									crystal_backup[ole1 + 2 + 5 * (ole3 + t * (ole4 + jgn_supercell_xyz[2] / 2 + jgn_supercell_xyz[2] * (ole2 + jgn_supercell_xyz[1] / 2 + jgn_supercell_xyz[1] * (ole + jgn_supercell_xyz[0] / 2))))] = my_direct[ole1 + 2 + 5 * (ole3)] + ole * ijk[0][ole1] + ole2 * ijk[1][ole1] + ole4 * ijk[2][ole1];//cartesians
-
-	/*								if (crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] < min_xyz[ole1])
-									{
-										min_xyz[ole1] = crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))];
-
-									}
-									if (crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))] > max_xyz[ole1])
-									{
-										max_xyz[ole1] = crystal[ole1 + 2 + 5 * (ole3 + t * (ole4 + sized[2] / 2 + sized[2] * (ole2 + sized[1] / 2 + sized[1] * (ole + sized[0] / 2))))];
-
-									}*/
-
-								}
-							}
-
-
-							//rewind(periodic_table);
-
+							as += vs.original->group[g].N_atoms;
 						}
 					}
 				}
-
 			}
-			//ttest =  omp_get_wtime() - ttest;
-			//cout << ttest << endl;
-			//fclose(periodic_table);
+		}
+		if (d == 0)
+			okrender = 0;
+		goto peintit;
 
+	}
+	//char *test4 = "randSelection%(";
+	for (i = 0; i < 15; i++)
+	{
+		if (test1[10][i] == ttt[i])
+		{
 
 		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 15)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 15);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		float percent = 0;//0-1
+		int pos_token = rstr.find(")");
+		//extract the percentage
+		jgn::string percent_input = (char*)rstr.substr(0, pos_token - 1).c_str();
+		if (percent_input.isnumber())
+		{
+			percent = std::stof(percent_input);
+		}
+		else
+		{
+			return;
+		}
+
+		vs.unsellectAll();
+		vs._sellectHistory2undo = 0;
+		ole = 0;
+		//random sellect %
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+		for (int g = 0; g < vs.N_groups; g++)
+		{
+			for (int i = 0; i < vs.group[g].N_atoms; i++)
+			{
+				ole++;
+				if (((float)rand() / (float)RAND_MAX) < percent)
+				{
+					vs.group[g].isSelected[i] = true;
+				}
+			}
+		}
+		//change element type
+		//vs.selected_change_element(element_input);
+		//vs.updateinfo();
+		goto peintit;
+	}
+
+	//char *test4 = "randSelection(";
+	for (i = 0; i < 14; i++)
+	{
+		if (test1[15][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 14)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 14);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		float Natoms = 0;//0-1
+		int pos_token = rstr.find(")");
+		//extract the percentage
+		jgn::string percent_input = (char*)rstr.substr(0, pos_token - 1).c_str();
+		if (percent_input.isnumber())
+		{
+			Natoms = std::stof(percent_input);
+		}
+		else
+		{
+			return;
+		}
+
+		vs.unsellectAll();
+		vs._sellectHistory2undo = 0;
+		ole = 0;
+		//random sellect
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+		for (int i = 0; i < Natoms; i++)
+		{
+			int atos = vs.N_atoms * rand() / (float)RAND_MAX;
+			if (vs._sellectHistory[atos].z != -1)
+			{
+				i--;
+			}
+			else
+			{
+				vs._sellectHistory[atos].z = 0;
+				vs.group[vs._sellectHistory[atos].x].isSelected[vs._sellectHistory[atos].y] = true;
+			}
+		}
+		//change element type
+		//vs.selected_change_element(element_input);
+		//vs.updateinfo();
+		goto peintit;
+	}
+
+	//char *test4 = "changeElement(";
+	for (i = 0; i < 14; i++)
+	{
+		if (test1[11][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 14)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 14);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		//get rid of the spaces
+		int rstrpos = rstr.find(" ");
+		while (rstrpos != std::string::npos)
+		{
+			rstr.erase(rstrpos, 1);
+			rstrpos = rstr.find(" ");
+		}
+		vs.selected_change_element(rstr);
+		vs.updateinfo();
+		vs.unsellectAll();
+		goto peintit;
+	}
+
+	//char *test4 = "save(";
+	for (i = 0; i < 5; i++)
+	{
+		if (test1[12][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 5)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 5);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		rstr.erase(0, 1);
+		rstr.erase(rstr.size() - 1, 1);
+		//TODO: do a stupid proof test
+		BuildPoscar((char*)rstr.c_str());
 
 		goto peintit;
 
+	}
+
+	//char *test4 = "loadOrigin";
+	for (i = 0; i < 10; i++)
+	{
+		if (test1[13][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 10)
+	{
+		okrender = 1;
+		//vs = vs.original;
+
+		jgnCommands(L"supercell(1,1,1)", 1);
+		jgnCommands(L"clean", 1);
+		
+
+		goto peintit;
+	}
+	//char *test4 = "rotate(";
+	for (i = 0; i < 7; i++)
+	{
+
+		if (test1[14][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 7)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 7);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		rstr.erase();
+		int rstrpos = rstr.find(",");
+		jgn::string raxes = (char*)rstr.substr(0, rstrpos).c_str();
+		if (raxes.compare("x") == 0)
+		{
+			vs.selected_change_hovered_axes = X_AXIS;
+		}
+		else if (raxes.compare("y") == 0)
+		{
+			vs.selected_change_hovered_axes = Y_AXIS;
+		}
+		else if (raxes.compare("z") == 0)
+		{
+			vs.selected_change_hovered_axes = Z_AXIS;
+		}
+		rstr.erase(0, rstrpos + 1);
+		float rangle = atof(rstr.substr(0, rstr.size()).c_str());
+		rangle = M_PI * rangle / 180;
+
+		vs.toggleselected_rotate(true);
+		vs.isrotating_theselected = true;
+		vs.rotate_selected(jgn::vec2(0, 0), jgn::vec2(0, 0), rangle);
+		vs.isrotating_theselected = false;
+		vs.toggleselected_rotate(false);
+
+		goto peintit;
+	}
+
+	//char *test4 = "delete";
+	for (i = 0; i < 6; i++)
+	{
+		if (test1[16][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 6)
+	{
+		okrender = 1;
+		deleteSelected();
+		vs.updateinfo();
+		goto peintit;
+	}
+
+	//char *test4 = "restart";
+	for (i = 0; i < 7; i++)
+	{
+		if (test1[17][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 7)
+	{
+		okrender = 1;
+		vs.restart();
+		goto peintit;
+	}
+
+	//char *test4 = "fopen(";
+	for (i = 0; i < 6; i++)
+	{
+		if (test1[18][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 6)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 7);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, '"');
+		strcpy(inpf, rstr.c_str());//for legacy reasons
+		JGN_DropFile(rstr.c_str());
+		jgn_file_dropd = true;
+		goto peintit;
+	}
+
+	//char *test4 = "mkfacet(";
+	for (i = 0; i < 8; i++)
+	{
+		if (test1[19][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 8)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 8);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		rstr.eraseblank();
+
+		int h, k, l;
+		jgn::vec3 v0;//the vector that will become perpendicular to z-axis
+		jgn::quaternion atomq;//the equivalent quartenion of every atomic position
+		jgn::vec3 vr;//we will rotate everything around this vector
+		jgn::quaternion vrq;//the equivalent of vr for quaternion
+		float theta;//rotate everything by theta around vr
+		jgn::quaternion fvpr[3];//here we will construct the new primitive vectors
+		jgn::quaternion fvpr0[3];//same but keeping the initial values
+		//h
+		int pos_token = rstr.find(",");
+		if (pos_token == std::string::npos || !((jgn::string)((char*)rstr.substr(0, pos_token).c_str())).isnumber())
+		{
+			okrender = 0;
+			goto peintit;
+		}
+		h = std::stoi(rstr.substr(0, pos_token).c_str());
+		rstr.erase(0, pos_token + 1);
+		//k
+		pos_token = rstr.find(",");
+		if (pos_token == std::string::npos || !((jgn::string)((char*)rstr.substr(0, pos_token).c_str())).isnumber())
+		{
+			okrender = 0;
+			goto peintit;
+		}
+		k = std::stoi(rstr.substr(0, pos_token).c_str());
+		rstr.erase(0, pos_token + 1);
+		//l
+		if (!((jgn::string)((char*)rstr.substr(0, pos_token).c_str())).isnumber())
+		{
+			okrender = 0;
+			goto peintit;
+		}
+		l = std::stoi(rstr.c_str());
+		//TODO:reduce the indexes
+		//now we have    h k l
+		jgn::vec3* vpr = vs.original->group[vs._isimulationBox].primitiveVec;//primitive vectors
+		jgn::vec3 hkl = jgn::vec3(h, k, l);
+		v0 = *jgn::millerP2V(&hkl, vpr);
+		//std::cout << "m" << *m << std::endl;
+		//std::cout << v0 << std::endl;
+		//now we have v0
+		vr.x = v0.y;
+		vr.y = -v0.x;
+		vr.z = 0;
+		//now we have vr
+		if (vr.abs() == 0)
+		{
+			okrender = 0;
+			goto peintit;
+		}
+		float vrabs = vr.abs();
+		vr.x = vr.x / vrabs;
+		vr.y = vr.y / vrabs;
+		//now we have vr as a unit vector
+		theta = std::acos((v0.z) / v0.abs());
+		//now we have theta in radians
+		vrq.a = cos(theta / 2.f);
+		vrq.b = vr.x*sin(theta / 2.f);
+		vrq.c = vr.y*sin(theta / 2.f);
+		vrq.d = vr.z*sin(theta / 2.f);
+		//now we have the quartenion
+		//first create a big bulk 
+		jgnCommands(L"supercell(10,10,10)", 0);
+		//we will now make the rotation
+		for (int g = 0; g < vs.N_groups; g++)
+		{//for every group
+			for (int i = 0; i < vs.group[g].N_atoms; i++)
+			{//for every atom
+				//create the quartenion
+				//first center the bulk at the origin
+				vs.group[g].position[i] = vs.group[g].position[i].translate(vs.group[vs._isimulationBox].primitiveVec[0] * (-0.5));
+				vs.group[g].position[i] = vs.group[g].position[i].translate(vs.group[vs._isimulationBox].primitiveVec[1] * (-0.5));
+				vs.group[g].position[i] = vs.group[g].position[i].translate(vs.group[vs._isimulationBox].primitiveVec[2] * (-0.5));
+				atomq.a = 0;
+				atomq.b = vs.group[g].position[i].x;
+				atomq.c = vs.group[g].position[i].y;
+				atomq.d = vs.group[g].position[i].z;
+				jgn::quaternion ans = (vrq*atomq)*vrq.conjugate();
+				vs.group[g].position[i].x = ans.b;
+				vs.group[g].position[i].y = ans.c;
+				vs.group[g].position[i].z = ans.d;
+			}
+		}
+		//lets prepare the primitive vectors
+		//create a grid of duplicated (0,0,0) points and rotate it
+		jgn::quaternion duplicateO[10][10][10];
+		for (int i = -5; i < 5; i++)
+		{
+			for (int j = -5; j < 5; j++)
+			{
+				for (int k = -5; k < 5; k++)
+				{
+					duplicateO[i + 5][j + 5][k + 5] = jgn::quaternion(0,
+						vpr[0].x*i + vpr[1].x*j + vpr[2].x*k,
+						vpr[0].y*i + vpr[1].y*j + vpr[2].y*k,
+						vpr[0].z*i + vpr[1].z*j + vpr[2].z*k);
+					duplicateO[i + 5][j + 5][k + 5] = (vrq*duplicateO[i + 5][j + 5][k + 5])*vrq.conjugate();
+				}
+			}
+		}
+		//z
+		//x
+		//y
+		fvpr[0] = jgn::quaternion(0, 1000, 1000, 1000);
+		for (int i = 9 ; i >= 0; i--)
+		{
+			for (int j = 9; j >= 0; j--)
+			{
+				for (int k = 9; k >= 0; k--)
+				{
+					if (duplicateO[i][j][k].vec3().abs() != 0)
+					{
+						if (abs(duplicateO[i][j][k].b) < 0.01 && abs(duplicateO[i][j][k].c) < 0.01)
+						{
+							if (duplicateO[i][j][k].vec3().abs() < fvpr[0].vec3().abs())
+							{
+								fvpr[0] = duplicateO[i][j][k];
+							}
+						}
+					}
+				}
+			}
+		}
+
+		fvpr[1] = jgn::quaternion(0, 1000, 1000, 1000);
+		for (int i = 9; i >= 0; i--)
+		{
+			for (int j = 9; j >= 0; j--)
+			{
+				for (int k = 9; k >= 0; k--)
+				{
+					if (duplicateO[i][j][k].vec3().abs() != 0)
+						if (abs(duplicateO[i][j][k].d) < 0.01)
+						{
+							if (duplicateO[i][j][k].vec3().abs() < fvpr[1].vec3().abs())
+							{
+								fvpr[1] = duplicateO[i][j][k];
+							}
+						}
+				}
+			}
+		}
+
+		fvpr[2] = jgn::quaternion(0, 1000, 1000, 1000);
+		for (int i = 9; i >= 0; i--)
+		{
+			for (int j = 9; j >= 0; j--)
+			{
+				for (int k = 9; k >= 0; k--)
+				{
+					if (duplicateO[i][j][k].vec3().abs() != 0)
+						if (abs(duplicateO[i][j][k].d) < 0.01)
+						{
+							if (duplicateO[i][j][k].vec3().abs() < fvpr[2].vec3().abs())
+							{
+								if (!(abs(fvpr[1].b / duplicateO[i][j][k].b - fvpr[1].c / duplicateO[i][j][k].c) < 0.01))
+								{
+									fvpr[2] = duplicateO[i][j][k];
+								}
+							}
+						}
+				}
+			}
+		}
+
+
+
+		sized[0] = 1;
+		sized[1] = 1;
+		sized[2] = 1;
+
+		//the primitive vectors are ready... put them in the vs.group[...
+		vs.group[vs._isimulationBox].primitiveVec[2].x = fvpr[0].b;
+		vs.group[vs._isimulationBox].primitiveVec[2].y = fvpr[0].c;
+		vs.group[vs._isimulationBox].primitiveVec[2].z = fvpr[0].d;
+
+		vs.group[vs._isimulationBox].primitiveVec[0].x = fvpr[1].b;
+		vs.group[vs._isimulationBox].primitiveVec[0].y = fvpr[1].c;
+		vs.group[vs._isimulationBox].primitiveVec[0].z = fvpr[1].d;
+
+		vs.group[vs._isimulationBox].primitiveVec[1].x = fvpr[2].b;
+		vs.group[vs._isimulationBox].primitiveVec[1].y = fvpr[2].c;
+		vs.group[vs._isimulationBox].primitiveVec[1].z = fvpr[2].d;
+
+		if (vs.group[vs._isimulationBox].primitiveVec[0].x < 0)
+		{
+			vs.group[vs._isimulationBox].primitiveVec[0].x = -fvpr[1].b;
+			vs.group[vs._isimulationBox].primitiveVec[0].y = -fvpr[1].c;
+			vs.group[vs._isimulationBox].primitiveVec[0].z = -fvpr[1].d;
+		}
+		if (vs.group[vs._isimulationBox].primitiveVec[1].y < 0)
+		{
+			vs.group[vs._isimulationBox].primitiveVec[1].x = -fvpr[2].b;
+			vs.group[vs._isimulationBox].primitiveVec[1].y = -fvpr[2].c;
+			vs.group[vs._isimulationBox].primitiveVec[1].z = -fvpr[2].d;
+		}
+
+		vs._updateSimulationBox();
+		//cut every atom outside of the unit cell
+		//x
+		jgn::string tocut = test1[4];
+		char *buf = new char[100];
+		float tantheta = vs.group[vs._isimulationBox].primitiveVec[1].x / vs.group[vs._isimulationBox].primitiveVec[1].y;
+		tocut += "1,0,0,";
+		itoa((int)abs((vs.group[vs._isimulationBox].primitiveVec[0].x) - (vs.group[vs._isimulationBox].primitiveVec[0].y*tantheta) - 1), buf, 10);
+		tocut += buf;
+		tocut += ')';
+		jgnCommands(jgn::string2LPTSTR(tocut), 0);
+		CustomSurfaces[CustomSurfacesCount - 1][3] = vs.group[vs._isimulationBox].primitiveVec[0].x*CustomSurfaces[CustomSurfacesCount - 1][0] + vs.group[vs._isimulationBox].primitiveVec[0].y*CustomSurfaces[CustomSurfacesCount - 1][1] + vs.group[vs._isimulationBox].primitiveVec[0].z*CustomSurfaces[CustomSurfacesCount - 1][2] - 0.1;
+		//-x
+		tocut = test1[4];
+		tocut += "-1,0,0,1)";
+		jgnCommands(jgn::string2LPTSTR(tocut), 0);
+		CustomSurfaces[CustomSurfacesCount - 1][3] = 0.1;
+		//y
+		tantheta = vs.group[vs._isimulationBox].primitiveVec[0].y / vs.group[vs._isimulationBox].primitiveVec[0].x;
+		tocut = test1[4];
+		tocut += "0,1,0,";
+		itoa((int)abs((vs.group[vs._isimulationBox].primitiveVec[1].y) - (vs.group[vs._isimulationBox].primitiveVec[1].x*tantheta) - 1), buf, 10);
+		tocut += buf;
+		tocut += ')';
+		jgnCommands(jgn::string2LPTSTR(tocut), 0);
+		CustomSurfaces[CustomSurfacesCount - 1][3] = vs.group[vs._isimulationBox].primitiveVec[1].x*CustomSurfaces[CustomSurfacesCount - 1][0] + vs.group[vs._isimulationBox].primitiveVec[1].y*CustomSurfaces[CustomSurfacesCount - 1][1] + vs.group[vs._isimulationBox].primitiveVec[1].z*CustomSurfaces[CustomSurfacesCount - 1][2] - 0.1;
+		//-y
+		tocut = test1[4];
+		tocut += "0,-1,0,1)";
+		jgnCommands(jgn::string2LPTSTR(tocut), 0);
+		CustomSurfaces[CustomSurfacesCount - 1][3] = 0.1;
+		//z
+		tocut = test1[4];
+		tocut += "0,0,1,";
+		itoa((int)(vs.group[vs._isimulationBox].primitiveVec[2].z - 1), buf, 10);
+		tocut += buf;
+		tocut += ')';
+		jgnCommands(jgn::string2LPTSTR(tocut), 0);
+		CustomSurfaces[CustomSurfacesCount - 1][3] = vs.group[vs._isimulationBox].primitiveVec[2].z - 0.1;
+		//-z
+		tocut = test1[4];
+		tocut += "0,0,-1,1)";
+		jgnCommands(jgn::string2LPTSTR(tocut), 0);
+		CustomSurfaces[CustomSurfacesCount - 1][3] = 0.1;
+
+		goto peintit;
+	}
+
+	//char *test4 = "randstress";
+	for (i = 0; i < 10; i++)
+	{
+		if (test1[20][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 10)
+	{
+		okrender = 1;
+		//help = (char*)(ttt + 7);
+		//jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, '"');
+		//strcpy(inpf, rstr.c_str());//for legacy reasons
+		//JGN_DropFile(rstr.c_str());
+		//jgn_file_dropd = true;
+		///1-x
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+		float stress = vs.group[vs._isimulationBox].primitiveVec[0].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[0].x += stress;
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count()+1);
+		stress = vs.group[vs._isimulationBox].primitiveVec[0].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[0].y += stress;
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 2);
+		stress = vs.group[vs._isimulationBox].primitiveVec[0].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[0].z += stress;
+
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 3);
+		stress = vs.group[vs._isimulationBox].primitiveVec[1].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[1].x += stress;
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 4);
+		stress = vs.group[vs._isimulationBox].primitiveVec[1].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[1].y += stress;
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 5);
+		stress = vs.group[vs._isimulationBox].primitiveVec[1].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[1].z += stress;
+
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 6);
+		stress = vs.group[vs._isimulationBox].primitiveVec[2].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[2].x += stress;
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 7);
+		stress = vs.group[vs._isimulationBox].primitiveVec[2].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[2].y += stress;
+		srand(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() + 8);
+		stress = vs.group[vs._isimulationBox].primitiveVec[2].abs()*(rand() / (float)RAND_MAX * 2 - 1) * 0.04;
+		vs.group[vs._isimulationBox].primitiveVec[2].z += stress;
+
+		vs._updateSimulationBox();
+
+		for (int g = 0; g<vs.N_groups; g++)
+		{
+			for (int i = 0; i < vs.group[g].N_atoms; i++)
+			{
+				vs.group[g].position[i].x = vs.group[g].fractional[i].x*vs.group[vs._isimulationBox].primitiveVec[0].x + vs.group[g].fractional[i].y*vs.group[vs._isimulationBox].primitiveVec[1].x + vs.group[g].fractional[i].z*vs.group[vs._isimulationBox].primitiveVec[2].x;
+				vs.group[g].position[i].y = vs.group[g].fractional[i].x*vs.group[vs._isimulationBox].primitiveVec[0].y + vs.group[g].fractional[i].y*vs.group[vs._isimulationBox].primitiveVec[1].y + vs.group[g].fractional[i].z*vs.group[vs._isimulationBox].primitiveVec[2].y;
+				vs.group[g].position[i].z = vs.group[g].fractional[i].x*vs.group[vs._isimulationBox].primitiveVec[0].z + vs.group[g].fractional[i].y*vs.group[vs._isimulationBox].primitiveVec[1].z + vs.group[g].fractional[i].z*vs.group[vs._isimulationBox].primitiveVec[2].z;
+			}
+		}
+
+		//uccartesian[i * 3 + 0] = my_direct[2 + i * 5 + 0] * ijk[0][0] + my_direct[2 + i * 5 + 1] * ijk[1][0] + my_direct[2 + i * 5 + 2] * ijk[2][0];
+		//uccartesian[i * 3 + 1] = my_direct[2 + i * 5 + 0] * ijk[0][1] + my_direct[2 + i * 5 + 1] * ijk[1][1] + my_direct[2 + i * 5 + 2] * ijk[2][1];
+		//uccartesian[i * 3 + 2] = my_direct[2 + i * 5 + 0] * ijk[0][2] + my_direct[2 + i * 5 + 1] * ijk[1][2] + my_direct[2 + i * 5 + 2] * ijk[2][2];
+
+
+		goto peintit;
 	}
 
 
@@ -3962,12 +4477,16 @@ peintit1:
 
 	if (okrender)
 	{
+#if !defined(JGN_NO_CMD_HISTORY) 
 		SendMessage(CommandTextHistory, EM_SETREADONLY, FALSE, NULL);
+#endif
 
 		okrender = 0;
 
+#if !defined(JGN_NO_CMD_HISTORY) 
 		SendMessage(CommandTextHistory, EM_SETSEL, 0, -1);
 		SendMessage(CommandTextHistory, EM_SETSEL, -1, 0);
+#endif
 
 		for (i = 0; i < 50; i++)
 		{
@@ -3982,22 +4501,28 @@ peintit1:
 				{
 					i = 100;
 				}
+#if !defined(JGN_NO_CMD_HISTORY) 
 				else
 				{
 					SendMessage(CommandTextHistory, WM_CHAR, (TCHAR)ttt[i], 0);
 
 
 				}
+#endif
 			}
 		}
 
+#if !defined(JGN_NO_CMD_HISTORY) 
 		if (d == 1)
 		{
 			SendMessage(CommandTextHistory, WM_CHAR, (TCHAR)ucender[0], 0);
 		}
+#endif
 
 		SetFocus(CommandTextField);
+#if !defined(JGN_NO_CMD_HISTORY) 
 		SendMessage(CommandTextHistory, EM_SETREADONLY, TRUE, NULL);
+#endif
 
 		for (i = 0; i < 50; i++)
 		{
@@ -4027,17 +4552,19 @@ void jgn_initcmd()
 
 
 	GetWindowRect(mnhwnd, glb_rct);
-
+#if !defined(JGN_NO_CMD_HISTORY) 
 	CommandTextHistory = CreateWindow(L"EDIT",
 		0, WS_VISIBLE | WS_POPUP | WS_VSCROLL | ES_MULTILINE,
 		(*glb_rct).left + 7, (*glb_rct).bottom - 286, (*glb_rct).right - (*glb_rct).left - 15, 242,
 		mnhwnd, NULL, hinst111, NULL);
+#endif
 
 	fOnt = CreateFont(30, 0, 0, 0, 0, TRUE, 0, 0, 0, 0, 0, 0, 0, L"Arial");
 
-
+#if !defined(JGN_NO_CMD_HISTORY) 
 	SendMessage(CommandTextHistory, EM_SETREADONLY, TRUE, NULL);
 	SendMessage(CommandTextHistory, WM_SETFONT, (WPARAM)fOnt, TRUE);
+#endif
 
 
 	CommandTextField = CreateWindow(L"EDIT",
@@ -4049,6 +4576,12 @@ void jgn_initcmd()
 	oldEditProc = (WNDPROC)SetWindowLongPtr(CommandTextField, GWLP_WNDPROC, (LONG_PTR)WndProcEditBox);
 
 	SendMessage(CommandTextField, WM_SETFONT, (WPARAM)fOnt, TRUE);
+
+	//create tool bar
+	//HWND ToolBar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_DLGFRAME | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, mnhwnd, NULL, GetModuleHandle(NULL), NULL);
+	//SendMessage(ToolBar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+
+
 
 	JGN_PostRedisplay();
 }
@@ -4072,7 +4605,7 @@ float find_theta(float R)
 	//for (int i = 0; i < 100; i++)
 	//{
 	//
-	//	//cout << f(x0, R)*f(x1, R) << endl;
+	//	//std::cout << f(x0, R)*f(x1, R) << std::endl;
 	//	float xnew = (x0 + x1) / 2.0;
 	//	if (f(x0,R)*f(xnew,R) <= 0)
 	//	{
@@ -4099,9 +4632,9 @@ void MakeScroll()
 	//S3v=tube_param
 
 	int S2vforreal = S2v - S1v;
-	//cout << S1v << ' ' << S2v << ' ' << S3v << endl;
-	//cout << (max_xyz[0] - min_xyz[0]) << ' ' << S3v << endl;
-	int ajklsdfl = t * (sized[0])*(sized[1])*(sized[2]);
+	//std::cout << S1v << ' ' << S2v << ' ' << S3v << std::endl;
+	//std::cout << (max_xyz[0] - min_xyz[0]) << ' ' << S3v << std::endl;
+	//int ajklsdfl = t * (sized[0])*(sized[1])*(sized[2]);
 
 	//Bisection to find max_theta
 	float max_theta = find_theta(float(S2v));
@@ -4112,28 +4645,54 @@ void MakeScroll()
 	S3v = ((max_xyz[0] - min_xyz[0]) * 2 * M_PI) / max_theta;
 	S3v = S3v + ((max_xyz[0] - min_xyz[0]) * 2 * M_PI) / min_theta;
 
-	cout << S3v << endl;
 
+	sized[0] = vs.group[0].primitiveVec[0].abs() / vs.original->group[0].primitiveVec[0].abs();
+	sized[1] = vs.group[0].primitiveVec[1].abs() / vs.original->group[0].primitiveVec[1].abs();
+	sized[2] = vs.group[0].primitiveVec[2].abs() / vs.original->group[0].primitiveVec[2].abs();
+	//std::cout << sized[0] << " " << sized[1] << " " << sized[2] << std::endl;
 	//S3v = max_theta / (max_xyz[0]);
-	cout << S3v << endl;
+	int as = 0;//atom position starts at
+	for (int g = 0; g < vs.N_groups; g++)
+	{//for every group
+		for (int k = 0; k < sized[2]; k++)
+		{
+			for (int j = 0; j < sized[1]; j++)
+			{
+				for (int i = 0; i < sized[0]; i++)
+				{
+					for (int a = 0; a < vs.original->group[g].N_atoms; a++)
+					{//for every atom within the group
+						vs.group[g].position[a + as] = vs.original->group[g].position[a] + vs.original->group[vs._isimulationBox].primitiveVec[0] * i + vs.original->group[vs._isimulationBox].primitiveVec[1] * j + vs.original->group[vs._isimulationBox].primitiveVec[2] * k;
+						
+						float R = S1v + S2vforreal * (vs.group[g].position[a + as].x- min_xyz[0]) / (max_xyz[0] - min_xyz[0]);
+						float theta = vs.group[g].position[a + as].x * (2 * M_PI / S3v);
+						vs.group[g].position[a + as].z = R * sin(theta);
 
-	for (ole3 = 0; ole3 < ajklsdfl; ole3++)
-	{
-		crystal[2 + 5 * ole3] = crystal_backup[2 + 5 * ole3];
-		crystal[4 + 5 * ole3] = crystal_backup[4 + 5 * ole3];
+						vs.group[g].position[a + as].x = R * cos(theta);
 
-		double R = S1v + S2vforreal * (crystal[2 + 5 * ole3] - min_xyz[0]) / (max_xyz[0] - min_xyz[0]);
-
-		//Archimedes' Spiral
-		//http://mathworld.wolfram.com/ArchimedesSpiral.html
-
-		float theta = crystal[2 + 5 * ole3] * (2 * M_PI / S3v);
-
-
-		crystal[4 + 5 * ole3] = R * sin(theta);
-
-		crystal[2 + 5 * ole3] = R * cos(theta);
+					}
+					as += vs.original->group[g].N_atoms;
+				}
+			}
+		}
 	}
+	//for (ole3 = 0; ole3 < ajklsdfl; ole3++)
+	//{
+	//	crystal[2 + 5 * ole3] = crystal_backup[2 + 5 * ole3];
+	//	crystal[4 + 5 * ole3] = crystal_backup[4 + 5 * ole3];
+
+	//	double R = S1v + S2vforreal * (crystal[2 + 5 * ole3] - min_xyz[0]) / (max_xyz[0] - min_xyz[0]);
+
+	//	//Archimedes' Spiral
+	//	//http://mathworld.wolfram.com/ArchimedesSpiral.html
+
+	//	float theta = crystal[2 + 5 * ole3] * (2 * M_PI / S3v);
+
+
+	//	crystal[4 + 5 * ole3] = R * sin(theta);
+
+	//	crystal[2 + 5 * ole3] = R * cos(theta);
+	//}
 
 
 }

@@ -2,4 +2,4 @@
 
 
 
-void JGN_DropFile();
+void JGN_DropFile(const char* inpf);

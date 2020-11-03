@@ -14,13 +14,13 @@ void JGN_bmpLoad(char filename[], int A)
 
 	if (A != 1 && A != 0)
 	{
-		cout << "Second argument must be JGN_RGB or JGN_RGBA";
+		std::cout << "Second argument must be JGN_RGB or JGN_RGBA";
 	}
 	else
 	{
 		if (file == NULL)
 		{
-			cout << "Cant open bmp";
+			std::cout << "Cant open bmp";
 
 		}
 		else
@@ -28,7 +28,7 @@ void JGN_bmpLoad(char filename[], int A)
 			fread(&bfh, sizeof(BITMAPFILEHEADER), 1, file);
 			if (bfh.bfType != 0x4D42)
 			{
-				cout << "Not a valid bmp";
+				std::cout << "Not a valid bmp";
 			}
 			else
 			{

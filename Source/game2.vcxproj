@@ -177,28 +177,47 @@ move /Y "$(ProjectDir)..\$(Configuration)\*.pdb" "$(ProjectDir)$(Configuration)"
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bonds.h" />
+    <ClInclude Include="Cammera.h" />
+    <ClInclude Include="fontInfo.h" />
     <ClInclude Include="help me.h" />
     <ClInclude Include="JGN_bmpLoader.h" />
     <ClInclude Include="JGN_Build.h" />
+    <ClInclude Include="jgn_namespace.h" />
     <ClInclude Include="JGN_Resource.h" />
     <ClInclude Include="JGN_SolidSphere.h" />
     <ClInclude Include="JGN_StrokeCharacter.h" />
     <ClInclude Include="JGN_Windows.h" />
     <ClInclude Include="JGN_DropFile.h" />
+    <ClInclude Include="libs.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="predefines.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="ToolBar.h" />
+    <ClInclude Include="variables.h" />
+    <ClInclude Include="virtualwindow.h" />
+    <ClInclude Include="VSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="JGN_Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bonds.cpp" />
+    <ClCompile Include="Cammera.cpp" />
     <ClCompile Include="JGN_bmpLoader.cpp" />
     <ClCompile Include="JGN_Build.cpp" />
     <ClCompile Include="JGN_DropFile.cpp" />
     <ClCompile Include="JGN_SolidSphere.cpp" />
     <ClCompile Include="JGN_StrokeCharacter.cpp" />
     <ClCompile Include="JGN_Windows.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="ToolBar.cpp" />
+    <ClCompile Include="virtualwindow.cpp" />
+    <ClCompile Include="VSystem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
