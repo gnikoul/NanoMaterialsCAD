@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	JGN_Init();
 	JGN_InitWindowPosition(GetSystemMetrics(SM_CXSCREEN)/2 - 500, GetSystemMetrics(SM_CYSCREEN) / 2 - 400);
 	JGN_InitWindowSize(1000, 800);
-	JGN_CreateWindow(NanoDOT_v);
+	JGN_CreateWindow(NanoMaterialsCAD);
 
 
 
