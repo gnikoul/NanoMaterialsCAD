@@ -1,9 +1,9 @@
 for 1:100
-	fopen("C:\Users\User\Desktop\git\WINDOWSx64_binary\NanoMaterialsCAD\example\script/POSCAR")
+	fopen("..\example\script/POSCAR")
 	rand(0.1)
 	randSelection%(0.5)
 	changeElement(Mo)	
-	save("C:\Users\User\Desktop\git\WINDOWSx64_binary\NanoMaterialsCAD\example\script\Fe-Mo_50-50\POSCAR$i")
+	save("..\example\script\Fe-Mo_50-50\POSCAR$i")
 	restart
 endfor
 exit

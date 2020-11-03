@@ -521,7 +521,7 @@ void display1(void)//generates the graphics output.
 
 		glLoadIdentity();
 
-		glTranslatef(dipleft, 0.8, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.8, 0);
 		write::character('R');
 		write::character('1');
 		write::character(' ');
@@ -544,7 +544,7 @@ void display1(void)//generates the graphics output.
 
 		glLoadIdentity();
 
-		glTranslatef(dipleft, 0.6, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.6, 0);
 
 
 		write::character('R');
@@ -584,7 +584,7 @@ void display1(void)//generates the graphics output.
 			glColor3f(0, 0, 0);
 
 		}
-		glTranslatef(dipleft, 0.8, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.8, 0);
 
 		write::character('{');
 		write::character('1');
@@ -620,7 +620,7 @@ void display1(void)//generates the graphics output.
 		}
 
 
-		glTranslatef(dipleft, 0.6, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.6, 0);
 
 		write::character('{');
 		write::character('1');
@@ -645,7 +645,7 @@ void display1(void)//generates the graphics output.
 		glLoadIdentity();
 
 
-		glTranslatef(dipleft, 0.4, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.4, 0);
 
 		glColor3f(0, 0, 0);
 		write::character('{');
@@ -672,7 +672,7 @@ void display1(void)//generates the graphics output.
 	else if (Right_Hexagonal == -1)
 	{
 		glLoadIdentity();
-		glTranslatef(dipleft, 0.8, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.8, 0);
 		if (float(S1v) / float(S2v) > 1.14814814815)
 
 		{
@@ -709,7 +709,7 @@ void display1(void)//generates the graphics output.
 
 		glLoadIdentity();
 
-		glTranslatef(dipleft, 0.6, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.6, 0);
 
 
 		if (float(S1v) / float(S2v) < 0.86842105263)
@@ -749,7 +749,7 @@ void display1(void)//generates the graphics output.
 		glLoadIdentity();
 
 
-		glTranslatef(dipleft, 0.4, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.4, 0);
 
 
 		glColor3f(0, 0, 0);
@@ -778,7 +778,7 @@ void display1(void)//generates the graphics output.
 	else if (want_cyrcle[0] == 'y')
 	{
 		glLoadIdentity();
-		glTranslatef(dipleft, 0.8, 0);
+		glTranslatef(dipleft + tb.size + 0.05, 0.8, 0);
 
 		glColor3f(0, 0, 0);
 
@@ -805,7 +805,7 @@ void display1(void)//generates the graphics output.
 		if (S1[0] != '0')
 		{
 			glLoadIdentity();
-			glTranslatef(dipleft +  tb.size, 0.8, 0);
+			glTranslatef(dipleft +  tb.size + 0.05, 0.8, 0);
 
 
 			if (Scase == 1 || Scase == 2 || Scase == 3 || Scase == 4)
@@ -845,7 +845,7 @@ void display1(void)//generates the graphics output.
 
 			glLoadIdentity();
 
-			glTranslatef(dipleft + tb.size, 0.6, 0);
+			glTranslatef(dipleft + tb.size + 0.05, 0.6, 0);
 
 
 			if (Scase == 1 || Scase == 2 || Scase == 5 || Scase == 6)
@@ -884,7 +884,7 @@ void display1(void)//generates the graphics output.
 			glLoadIdentity();
 
 
-			glTranslatef(dipleft + tb.size, 0.4, 0);
+			glTranslatef(dipleft + tb.size + 0.05, 0.4, 0);
 
 
 			if (Scase == 1 || Scase == 3 || Scase == 5 || Scase == 7)
