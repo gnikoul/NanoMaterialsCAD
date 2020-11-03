@@ -94,7 +94,6 @@ void JGN_DropFile(const char* inpf)
 		mov[Svmax_buckup], esi
 	}*/
 	Svmax_buckup = Svmax;
-
 	if (ftype == 'p')
 	{
 
@@ -656,7 +655,7 @@ void JGN_DropFile(const char* inpf)
 		}
 		else if (inptype == 'c')
 		{
-			free(uccartesian);
+			//free(uccartesian);
 			uccartesian = my_direct;
 		}
 
@@ -664,6 +663,7 @@ void JGN_DropFile(const char* inpf)
 		sized[0] = 1;
 		sized[1] = 1;
 		sized[2] = 1;
+		
 
 		jgn::heapRealloc();
 
@@ -1973,7 +1973,6 @@ groupInit.fractional.emplace_back(jgn::vec3(crystal[2 + 5 * i] / groupInit.primi
 		groupInit.radius.emplace_back(1);
 		groupInit.color.emplace_back(jgn::vec3(fmod(groupInit.weight[i], 1.5), fmod(groupInit.number[i], 0.92), fmod(100 * fmod(groupInit.weight[i], 1.5) * fmod(groupInit.number[i], 0.92), 0.8)));
 	}
-
 	///////////push new group to vs and vs.original
 	vs.group.push_back(groupInit);
 	vs.N_groups++;

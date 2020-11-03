@@ -1050,7 +1050,7 @@ void variableinit()
 
 	dipleft = -1000.0 / 800.0;
 	dipapan = 1;
-	cam.perspective_on = true;
+	cam.perspective_on = false;
 	theta[0] = 0.0;
 	theta[1] = 0.0;
 	theta[2] = 0.0;

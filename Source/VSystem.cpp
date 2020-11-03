@@ -31,6 +31,7 @@ void VSystem::restart()
 		this->group[g].color_per_type.clear();//color of atoms
 		this->group[g].weight_per_type.clear();
 		this->group[g].position.clear();
+		this->group[g].fractional.clear();
 		this->group[g].type.clear();
 		this->group[g]._alltype.clear();//write all the individual types
 		this->group[g].selective_dynamics.clear();
@@ -80,6 +81,7 @@ void VSystem::restart()
 		this->original->group[g].color_per_type.clear();//color of atoms
 		this->original->group[g].weight_per_type.clear();
 		this->original->group[g].position.clear();
+		this->original->group[g].fractional.clear();
 		this->original->group[g].type.clear();
 		this->original->group[g]._alltype.clear();//write all the individual types
 		this->original->group[g].selective_dynamics.clear();

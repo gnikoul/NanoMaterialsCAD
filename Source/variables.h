@@ -304,7 +304,7 @@ L"randstress"
 EXT bool selective_dynamics_bool;
 EXT char* jgncmdfpath;
 EXT FILE* jgncmdfile;
-EXT char jgncmdfline[100];
+EXT char jgncmdfline[500];
 EXT char inptype;
 EXT float vec[3];
 EXT int crystalh;

@@ -2138,11 +2138,11 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 						jgncmdfile = fopen(jgncmdfpath, "r");
 
 
-						fgets(jgncmdfline, 100, jgncmdfile);
+						fgets(jgncmdfline, 500, jgncmdfile);
 
 						while ((jgncmdfline[0] != 'e' && jgncmdfline[1] != 'x' && jgncmdfline[2] != 'i' && jgncmdfline[3] != 't'))
 						{
-							for (i = 0; i < 100; i++)
+							for (i = 0; i < 500; i++)
 							{
 								ttt[i] = jgncmdfline[i];
 								if (jgncmdfline[i] == 0)
@@ -2175,7 +2175,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 								for (int i = istart; i <= ifin; i++)
 								{
 									fsetpos(jgncmdfile, &forBeggining);
-									fgets(jgncmdfline, 100, jgncmdfile);
+									fgets(jgncmdfline, 500, jgncmdfile);
 									jgn::string curentLine = jgncmdfline;
 									//std::cout << i << std::endl;
 									while (curentLine.find("endfor") == std::string::npos)
@@ -2191,7 +2191,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 										while (curentLine.c_str()[0] == ' ' || curentLine.c_str()[0] == '\t')
 											curentLine.erase(0, 1);
 										strcpy(jgncmdfline, curentLine.c_str());
-										for (int j = 0; j < 100; j++)
+										for (int j = 0; j < 500; j++)
 										{
 											ttt[j] = jgncmdfline[j];
 											if (jgncmdfline[j] == 0)
@@ -2200,8 +2200,11 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 											}
 										}
 										//std::wcout << ttt << std::endl;
+										//getchar();
 										jgnCommands(ttt, 0);
-										fgets(jgncmdfline, 100, jgncmdfile);
+										//std::cout << "done" << std::endl;
+										//getchar();
+										fgets(jgncmdfline, 500, jgncmdfile);
 										curentLine = jgncmdfline;
 									}
 								}
@@ -2209,7 +2212,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 							else
 							{
 								jgnCommands(ttt, 0);
-								fgets(jgncmdfline, 100, jgncmdfile);
+								fgets(jgncmdfline, 500, jgncmdfile);
 							}
 
 						}
