@@ -327,7 +327,7 @@ void JGN_PostRedisplay()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+		tb.draw();
 
 		SwapBuffers(global_hdc);
 
