@@ -6,4 +6,4 @@ NanoMaterialsCAD is an open source tool for computational materials and chemistr
 * VASP 
 * LAMMPS
 
-The executable of the software is placed in WINDOWSx64_binary\NanoMaterialsCAD\Release\NanoMaterialsCAD.exe. Download the directory and run the executable to use it. 
+The executable of the software is placed in WINDOWSx64_binary\NanoMaterialsCAD\Release\NanoMaterialsCAD.exe. Download the directory and run the executable to use it. If you want to compile the code yourself, use Visual Studio and run ptyxiakh.sln
