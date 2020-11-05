@@ -1,6 +1,5 @@
 .vs/
 Debug/
-Release/
 Source/Debug/
 Source/Release/
 *.db
