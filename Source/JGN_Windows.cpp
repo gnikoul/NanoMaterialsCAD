@@ -2140,7 +2140,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 
 						fgets(jgncmdfline, 500, jgncmdfile);
 
-						while ((jgncmdfline[0] != 'e' && jgncmdfline[1] != 'x' && jgncmdfline[2] != 'i' && jgncmdfline[3] != 't'))
+						while ((jgncmdfline[0] != 'e' || jgncmdfline[1] != 'x' || jgncmdfline[2] != 'i' || jgncmdfline[3] != 't'))
 						{
 							for (i = 0; i < 500; i++)
 							{
