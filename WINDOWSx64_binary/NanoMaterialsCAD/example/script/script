@@ -1,4 +1,4 @@
-for 1:10
+for 1:100
 	fopen("..\example\script/POSCAR")
 	rand(0.1)
 	randSelection%(0.5)
