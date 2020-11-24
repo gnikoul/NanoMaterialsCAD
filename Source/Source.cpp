@@ -2794,6 +2794,7 @@ void mouse_pasive(int x, int y)
 		else if (vs.isrotating_theselected)
 		{
 			vs.rotate_selected(mouse.pos, mouse.prevpos);
+
 		}
 		if((tb.sellectedTool == ToolBar::Tool::SELECT || tb.sellectedTool == ToolBar::Tool::DISTANCE) && !wn.show)
 		{

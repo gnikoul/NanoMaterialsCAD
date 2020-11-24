@@ -4062,6 +4062,119 @@ void jgnCommands(LPTSTR ttt, int d)
 		goto peintit;
 	}
 
+	//char *test4 = "magmomup(";
+	for (i = 0; i < 9; i++)
+	{
+
+		if (test1[22][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 9)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 9);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		float h, k, l;
+		jgn::vec3 vr;//rotate everything around vr
+		float theta;//for that amount of rad
+		jgn::quaternion vrq;//the equivalent of vr for quaternion
+		jgn::quaternion atomq;//the equivalent quartenion of every atomic position
+
+		int rstrpos = rstr.find(",");
+		jgn::string raxes = (char*)rstr.substr(0, rstrpos).c_str();
+		h = std::stof(raxes.c_str());
+		rstr.erase(0, rstrpos + 1);
+
+		rstrpos = rstr.find(",");
+		raxes = (char*)rstr.substr(0, rstrpos).c_str();
+		k = std::stoi(raxes.c_str());
+		rstr.erase(0, rstrpos + 1);
+
+		l= std::stoi(rstr.c_str());
+		//h k l are good up till here
+
+		jgn::quaternion millervec(0, 0, 0, 0);
+		//works only for cubic TODO
+		if (h != 0)
+		{
+			millervec.b = h;
+		}
+		else
+		{
+			millervec.b = 0;
+		}
+		if (k != 0)
+		{
+			millervec.c = k;
+		}
+		else
+		{
+			millervec.c = 0;
+		}
+		if (l != 0)
+		{
+			millervec.d = l;
+		}
+		else
+		{
+			millervec.d = 0;
+		}
+		//find the angle between vec3(0,0,1) and millervec
+		theta = std::acos(millervec.d / millervec.vec3().abs())*0.72;//in rad
+		//angle correct so far
+		
+		vr = jgn::xproduct(jgn::vec3(0, 0, 1), millervec.vec3());
+		//now we have vr
+		float vrabs = vr.abs();
+		vr.x = vr.x / vrabs;
+		vr.y = vr.y / vrabs;
+		vr.z = vr.z / vrabs;
+		//now we have vr as a unit vector
+		vrq.a = cos(theta / 2.f);
+		vrq.b = vr.x*sin(theta / 2.f);
+		vrq.c = vr.y*sin(theta / 2.f);
+		vrq.d = vr.z*sin(theta / 2.f);
+		//now we have the quartenion
+		//we will now make the rotation of the atoms
+		for (int g = 0; g < vs.N_groups; g++)
+		{//for every group
+			for (int i = 0; i < vs.group[g].N_atoms; i++)
+			{//for every atom
+				//create the quartenion
+				atomq.a = 0;
+				atomq.b = vs.group[g].position[i].x;
+				atomq.c = vs.group[g].position[i].y;
+				atomq.d = vs.group[g].position[i].z;
+				jgn::quaternion ans = (vrq*atomq)*vrq.conjugate();
+				vs.group[g].position[i].x = ans.b;
+				vs.group[g].position[i].y = ans.c;
+				vs.group[g].position[i].z = ans.d;
+			}
+		}
+		//we will now rotate the primitive vectors
+		//first vector
+		//create the quartenion
+		for (i = 0; i < 3; i++)
+		{
+			atomq.a = 0;
+			atomq.b = vs.group[vs._isimulationBox].primitiveVec[i].x;
+			atomq.c = vs.group[vs._isimulationBox].primitiveVec[i].y;
+			atomq.d = vs.group[vs._isimulationBox].primitiveVec[i].z;
+			jgn::quaternion ans = (vrq*atomq)*vrq.conjugate();
+			vs.group[vs._isimulationBox].primitiveVec[i].x = ans.b;
+			vs.group[vs._isimulationBox].primitiveVec[i].y = ans.c;
+			vs.group[vs._isimulationBox].primitiveVec[i].z = ans.d;
+			vs.setSimulationBox(vs._isimulationBox);
+		}
+		goto peintit;
+	}
+
 	//char *test4 = "delete";
 	for (i = 0; i < 6; i++)
 	{

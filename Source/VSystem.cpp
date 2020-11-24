@@ -629,7 +629,6 @@ void VSystem::_drawatoms()
 
 
 
-
 					glTranslatefvec3(this->group[g].position[i]);
 					glRotatef(-theta[1], 0.0, 0, 1);
 					glRotatef(-theta[0], 1.0, 0.0, 0.0);
@@ -642,14 +641,6 @@ void VSystem::_drawatoms()
 				}
 		}
 	}
-
-	/*if (CustomSurfacesCount > 0)
-	{
-		glBegin(GL_LINES);
-		glVertex3f(0, 0, 0);
-		glVertex3f(CustomSurfaces[CustomSurfacesCount - 1][0] / (Svmax + 5) * 100, CustomSurfaces[CustomSurfacesCount - 1][1] / (Svmax + 5) * 100, CustomSurfaces[CustomSurfacesCount - 1][2] / (Svmax + 5) * 100);
-		glEnd();
-	}*/
 
 
 }
@@ -981,6 +972,19 @@ void VSystem::rotate_selected(jgn::vec2& m /*mouse*/, jgn::vec2& mprev, float an
 					jgn::cpu_translate(&this->group[this->_sellectHistory[i].x].position[this->_sellectHistory[i].y].x, &c.x, &this->group[this->_sellectHistory[i].x].position[this->_sellectHistory[i].y].x);
 				}
 			}
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[0].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[0].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[0].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[1].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[1].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[1].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[2].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[2].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[2].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//
+			//vs.setSimulationBox(vs._isimulationBox);
 		}
 		else if (this->selected_change_hovered_axes == Y_AXIS)
 		{
@@ -1009,6 +1013,19 @@ void VSystem::rotate_selected(jgn::vec2& m /*mouse*/, jgn::vec2& mprev, float an
 					jgn::cpu_translate(&this->group[this->_sellectHistory[i].x].position[this->_sellectHistory[i].y].x, &c.x, &this->group[this->_sellectHistory[i].x].position[this->_sellectHistory[i].y].x);
 				}
 			}
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[0].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[0].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[0].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[1].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[1].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[1].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[2].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[2].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[2].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//
+			//vs.setSimulationBox(vs._isimulationBox);
 		}
 		else if (this->selected_change_hovered_axes == Z_AXIS)
 		{
@@ -1038,6 +1055,19 @@ void VSystem::rotate_selected(jgn::vec2& m /*mouse*/, jgn::vec2& mprev, float an
 
 				}
 			}
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[0].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[0].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[0].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[0].x);
+			//
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[1].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[1].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[1].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[1].x);
+			//
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[2].x, &c_negative.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//jgn::cpu_rotate(&this->group[this->_isimulationBox].primitiveVec[2].x, &rs.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//jgn::cpu_translate(&this->group[this->_isimulationBox].primitiveVec[2].x, &c.x, &this->group[this->_isimulationBox].primitiveVec[2].x);
+			//
+			//vs.setSimulationBox(vs._isimulationBox);
 		}
 		this->toggleselected_rotate(true);
 	}
