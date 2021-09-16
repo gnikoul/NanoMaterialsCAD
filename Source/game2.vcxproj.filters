@@ -81,6 +81,9 @@
     <ClInclude Include="Cammera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DefectedNPs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="JGN_Resource.rc">
@@ -128,6 +131,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cammera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DefectedNPs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

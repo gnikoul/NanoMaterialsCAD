@@ -25,7 +25,7 @@
 
 int main(int argc, char *argv[])
 {
-
+	
 #if NDEBUG
 	FreeConsole();
 #endif
