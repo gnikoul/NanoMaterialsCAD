@@ -21,11 +21,16 @@
 #include "Mouse.h"
 #include "Cammera.h"
 
+#include "DefectedNPs.h"
+
 #define glutSolidSphere JGN_SolidSphere
 
 int main(int argc, char *argv[])
 {
-	
+	icosahedral(1, 6);
+	//ecahedron(5, 2, 0, 1); //corect
+	getchar();
+
 #if NDEBUG
 	FreeConsole();
 #endif

@@ -2,13 +2,11 @@
 #include "VSystem.h"
 #include "DefectedNPs.h"
 
-Group Icosahedral(float lattice_constant, int noshells)
-{
+Group icosahedral(float lattice_constant, int noshells)
+{//Fix this
 	Group groupInit;
 	groupInit.N_atoms = 0;
 
-	lattice_constant = 1;
-	noshells = 6;
 
 	if (noshells < 1)
 		return groupInit;
@@ -16,37 +14,36 @@ Group Icosahedral(float lattice_constant, int noshells)
 	int t = 0.5 + sqrt(5.0) / 2.0;
 
 	jgn::vec3 verticies[12];
-	verticies[0].x = t; verticies[0].y = 0.0; verticies[0].z = 1.0;
-	verticies[1].x = t; verticies[1].y = 0.0; verticies[1].z = -1.0;
-	verticies[2].x = -t; verticies[2].y = 0.0; verticies[2].z = 1.0;
-	verticies[3].x = -t; verticies[3].y = 0.0; verticies[3].z = -1.0;
-	verticies[4].x = 1; verticies[4].y = t; verticies[4].z = 0.0;
-	verticies[5].x = -1; verticies[5].y = t; verticies[5].z = 0.0;
-	verticies[6].x = 1; verticies[6].y = -t; verticies[6].z = 0.0;
-	verticies[7].x = -1; verticies[7].y = -t; verticies[7].z = 0.0;
-	verticies[8].x = 0; verticies[8].y = 1; verticies[8].z = t;
-	verticies[9].x = 0; verticies[9].y = -1; verticies[9].z = t;
-	verticies[10].x = 0; verticies[10].y = 1; verticies[10].z = -t;
-	verticies[11].x = 0; verticies[11].y = -1; verticies[11].z = -t;
+	verticies[0] = jgn::vec3(t, 0., 1.);
+	verticies[1] = jgn::vec3(t, 0., -1.);
+	verticies[2] = jgn::vec3(-t, 0., 1.);
+	verticies[3] = jgn::vec3(-t, 0., -1.);
+	verticies[4] = jgn::vec3(1., t, 0.);
+	verticies[5] = jgn::vec3(-1., t, 0.);
+	verticies[6] = jgn::vec3(1., -t, 0.);
+	verticies[7] = jgn::vec3(-1., -t, 0.);
+	verticies[8] = jgn::vec3(0., 1., t);
+	verticies[9] = jgn::vec3(0., -1., t);
+	verticies[10] = jgn::vec3(0., 1., -t);
+	verticies[11] = jgn::vec3(0., -1., -t);
 
 
 
-	for (int s = 1; s < noshells; s++)
-	{
-		//Construct square edges(6)
-		for (int i = 0; i < 12; i = i + 2)
-		{
-			jgn::vec3 v1 = verticies[i];
-			jgn::vec3 v2 = verticies[i + 1];
-			for (int j = 0; j < s + 1; j++)
+	for (int n = 1; n < noshells; n++)
+	{	
+		for (int k = 0; k < 12; k = k + 2)
+		{//Construct square edges(6)
+			jgn::vec3 v1 = verticies[k];
+			jgn::vec3 v2 = verticies[k + 1];
+			for (int i = 0; i < n + 1; i++)
 			{
-				jgn::vec3 newpos = v1 * j + v2 * (s - j);
+				jgn::vec3 newpos = v1 * i + v2 * (n - i);
 				groupInit.position.push_back(newpos);
 				groupInit.N_atoms++;
 			}
 		}
 		// Construct triangle planes(12)
-		if (s > 1)
+		if (n > 1)
 		{
 			int map[12][2];
 			map[0][0] = 8; map[0][1] = 9;
@@ -61,18 +58,18 @@ Group Icosahedral(float lattice_constant, int noshells)
 			map[9][0] = 6; map[9][1] = 7;
 			map[10][0] = 4; map[10][1] = 5;
 			map[11][0] = 6; map[11][1] = 7;
-			for (int i = 0; i < 12; i++)
+			for (int k = 0; k < 12; k++)
 			{
-				jgn::vec3 v0 = verticies[i] * s;
-				jgn::vec3 v1 = verticies[map[i][0]] - verticies[i];
-				jgn::vec3 v2 = verticies[map[i][1]] - verticies[i];
-				for (int j = 0; j < s; j++)
+				jgn::vec3 v0 = verticies[k] * n;
+				jgn::vec3 v1 = verticies[map[k][0]] - verticies[k];
+				jgn::vec3 v2 = verticies[map[k][1]] - verticies[k];
+				for (int i = 0; i < n; i++)
 				{
-					for (int k = 0; k < s - j; k++)
+					for (int j = 0; j < n - i; j++)
 					{
-						if (j == 0 && k == 0)
+						if (i == 0 && j == 0)
 							continue;
-						jgn::vec3 newpos = v0 + v1 * j + v2 * k;
+						jgn::vec3 newpos = v0 + v1 * i + v2 * j;
 						groupInit.position.push_back(newpos);
 						groupInit.N_atoms++;
 					}
@@ -80,28 +77,28 @@ Group Icosahedral(float lattice_constant, int noshells)
 			}
 		}
 		// Fill missing triangle planes(8)
-		if (s > 2)
+		if (n > 2)
 		{
 			int map[4][4];
 			map[0][0] = 9; map[0][1] = 6; map[0][2] = 8; map[0][3] = 4;
 			map[1][0] = 11; map[1][1] = 6; map[1][2] = 10; map[1][3] = 4;
 			map[2][0] = 9; map[2][1] = 7; map[2][2] = 8; map[2][3] = 5;
 			map[3][0] = 11; map[3][1] = 7; map[3][2] = 10; map[3][3] = 5;
-			for (i = 0; i < 4; i++)
+			for (int k = 0; k < 4; k++)
 			{
-				jgn::vec3 v0 = verticies[i];
-				jgn::vec3 v1 = verticies[map[i][0]] - verticies[i];
-				jgn::vec3 v2 = verticies[map[i][1]] - verticies[i];
-				jgn::vec3 v3 = verticies[map[i][2]] - verticies[i];
-				jgn::vec3 v4 = verticies[map[i][3]] - verticies[i];
-				for (j = 1; j < s; j++)
+				jgn::vec3 v0 = verticies[k] * n;
+				jgn::vec3 v1 = verticies[map[k][0]] - verticies[k];
+				jgn::vec3 v2 = verticies[map[k][1]] - verticies[k];
+				jgn::vec3 v3 = verticies[map[k][2]] - verticies[k];
+				jgn::vec3 v4 = verticies[map[k][3]] - verticies[k];
+				for (int i = 1; i < n; i++)
 				{
-					for (k = 1; k < s - j; k++)
+					for (int j = 1; j < n - i; j++)
 					{
-						jgn::vec3 newpos = v0 + v1 * j + v2 * k;
+						jgn::vec3 newpos = v0 + v1 * i + v2 * j;
 						groupInit.position.push_back(newpos);
 						groupInit.N_atoms++;
-						newpos = v0 + v3 * j + v4 * k;
+						newpos = v0 + v3 * i + v4 * j;
 						groupInit.position.push_back(newpos);
 						groupInit.N_atoms++;
 					}
@@ -119,3 +116,79 @@ Group Icosahedral(float lattice_constant, int noshells)
 
 	return groupInit;
 }
+
+Group decahedron(int p, int q, int r, float lattice_constant)
+// p: Number of atoms on the (100) facets perpendicular to the five fold axis
+// q: Number of atoms on the (100) facets parallel to the five fold axis.q = 1 corresponds to no visible(100) facets.
+// r: Depth of the Marks re-entrence at the pentagon corners. r = 0 corresponds to no re - entrence.
+// Source code from ASE https://wiki.fysik.dtu.dk/ase/_modules/ase/cluster/decahedron.html
+{
+	Group groupInit;
+	groupInit.N_atoms = 0;
+
+	// Check values of p, q, r
+	if (p < 1 || q < 1)
+		return groupInit;
+	if (r < 0)
+		return groupInit;
+
+	// Defining constants
+	float t = 2.0 * M_PI / 5.0;
+	float b = lattice_constant / sqrt(2.0);
+	float a = b * sqrt(3.0) / 2.0;
+	jgn::vec3 verticies[5];
+	verticies[0] = jgn::vec3(cos(M_PI / 2.0), sin(M_PI / 2.0), 0.0) * a;
+	verticies[1] = jgn::vec3(cos(t * 1. + M_PI / 2.), sin(t * 1. + M_PI / 2.), 0.) * a;
+	verticies[2] = jgn::vec3(cos(t * 2. + M_PI / 2.), sin(t * 2. + M_PI / 2.), 0) * a;
+	verticies[3] = jgn::vec3(cos(t * 3. + M_PI / 2.), sin(t * 3. + M_PI / 2.), 0.) * a;
+	verticies[4] = jgn::vec3(cos(t * 4. + M_PI / 2.), sin(t * 4. + M_PI / 2.), 0.) * a;
+	// Number of atoms on the five fold axisand a nice constant
+	int h = p + q + 2 * r - 1;
+	int g = h - q + 1;
+	// Make the five fold axis
+	for (j = 0; j < h; j++)
+	{
+		jgn::vec3 newpos(0., 0., j * b - (h - 1) * b / 2.0);
+		groupInit.position.push_back(newpos);
+		groupInit.N_atoms++;
+	}
+	// Make pentagon rings around the five fold axis
+	for (int n = 1; n < h; n++)
+	{
+		if (n < g)
+		{// Condition for (100)-planes
+			for (int m = 0; m < 5; m++)
+			{
+				jgn::vec3 v1;
+				if (m == 0)
+				{
+					v1 = verticies[4];
+				}
+				else
+				{
+					v1 = verticies[m - 1];
+				}
+				jgn::vec3 v2 = verticies[m];
+				for (int i = 0; i < n; i++)
+				{
+					if (n - i < g - r && i < g - r)
+					{// Condition for marks re-entrence
+						for (int j = 0; j < h - n; j++)
+						{
+							jgn::vec3 newpos = v1 * (n - i) + v2 * i;
+							newpos = newpos + jgn::vec3(0.0, 0.0, j * b - (h - n - 1) * b / 2.0);
+							groupInit.position.push_back(newpos);
+							groupInit.N_atoms++;
+						}
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < groupInit.N_atoms; i++)
+	{
+		std::cout << groupInit.position[i] << std::endl;
+	}
+	return groupInit;
+}
+
