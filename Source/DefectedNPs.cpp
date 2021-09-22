@@ -10,9 +10,9 @@ Group icosahedral(float lattice_constant, int noshells)
 
 	if (noshells < 1)
 		return groupInit;
-
-	int t = 0.5 + sqrt(5.0) / 2.0;
-
+	groupInit.position.push_back(jgn::vec3(0, 0, 0));
+	groupInit.N_atoms++;
+	float t = 0.5 + sqrt(5.0) / 2.0;
 	jgn::vec3 verticies[12];
 	verticies[0] = jgn::vec3(t, 0., 1.);
 	verticies[1] = jgn::vec3(t, 0., -1.);
@@ -154,11 +154,11 @@ Group decahedron(int p, int q, int r, float lattice_constant)
 	}
 	// Make pentagon rings around the five fold axis
 	for (int n = 1; n < h; n++)
-	{
+	{// from inside to outside i.e from small (x,y) to larger (x,y)
 		if (n < g)
 		{// Condition for (100)-planes
 			for (int m = 0; m < 5; m++)
-			{
+			{// the five identical pieces
 				jgn::vec3 v1;
 				if (m == 0)
 				{
@@ -170,15 +170,15 @@ Group decahedron(int p, int q, int r, float lattice_constant)
 				}
 				jgn::vec3 v2 = verticies[m];
 				for (int i = 0; i < n; i++)
-				{
+				{// move around the 5-fold axis 
 					if (n - i < g - r && i < g - r)
 					{// Condition for marks re-entrence
 						for (int j = 0; j < h - n; j++)
-						{
-							jgn::vec3 newpos = v1 * (n - i) + v2 * i;
-							newpos = newpos + jgn::vec3(0.0, 0.0, j * b - (h - n - 1) * b / 2.0);
-							groupInit.position.push_back(newpos);
-							groupInit.N_atoms++;
+						{// from negative z to positive z
+								jgn::vec3 newpos = v1 * (n - i) + v2 * i;
+								newpos = newpos + jgn::vec3(0.0, 0.0, j * b - (h - n - 1) * b / 2.0);
+								groupInit.position.push_back(newpos);
+								groupInit.N_atoms++;
 						}
 					}
 				}

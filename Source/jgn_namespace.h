@@ -829,7 +829,7 @@ std::ostream& operator<<(std::ostream& stream, const jgn::vec3& vect)
 #ifdef JGN_SOURCE_CPP
 
 {
-	stream << vect.x << " , " << vect.y << " , " << vect.z;
+	stream << vect.x << "\t" << vect.y << "\t" << vect.z;
 	return stream;
 }
 #else
