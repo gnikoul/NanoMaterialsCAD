@@ -8,6 +8,7 @@
 #include "ToolBar.h"
 #include "JGN_DropFile.h"
 #include "Cammera.h"
+#include "DefectedNPs.h"
 #define JGN_CMD_PLANE
 
 /////////////////////////////////////////////////
@@ -1940,7 +1941,7 @@ LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
 			HINSTANCE hinst111 = (HINSTANCE)GetWindowLong(mnhwnd, GWLP_HINSTANCE);
 			hWndList = CreateWindow(L"LISTBOX",
 				0, WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_EXTENDEDSEL | WS_VSCROLL,
-				0, mainwndsize[1] -90 - 20 * itemscnt, 250, 20 * itemscnt,
+				0, mainwndsize[1] -90 - 20 * itemscnt, 350, 20 * itemscnt,
 				mnhwnd, NULL, hinst111, NULL);
 			//hWndList = CreateWindow(L"LISTBOX",
 			//	0, WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_EXTENDEDSEL | WS_VSCROLL,
@@ -4062,6 +4063,112 @@ void jgnCommands(LPTSTR ttt, int d)
 		goto peintit;
 	}
 
+	//char *test4 = "decahedron(";
+	for (i = 0; i < 11; i++)
+	{
+		if (test1[24][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 11)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 11);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		//(int p, int q, int r, float lattice_constant)
+		int p, q, r;
+		float lattice_constant;
+		// get p
+		int rstrpos = rstr.find(",");
+		jgn::string substr = (char*)rstr.substr(0, rstrpos).c_str();
+		p = std::stoi(substr.c_str());
+		rstr.erase(0, rstrpos + 1);
+		// get q
+		rstrpos = rstr.find(",");
+		substr = (char*)rstr.substr(0, rstrpos).c_str();
+		q = std::stoi(substr.c_str());
+		rstr.erase(0, rstrpos + 1);
+		// get r
+		rstrpos = rstr.find(",");
+		substr = (char*)rstr.substr(0, rstrpos).c_str();
+		r = std::stoi(substr.c_str());
+		rstr.erase(0, rstrpos + 1);
+		// get lattice_constant
+		lattice_constant = std::stof(rstr.c_str());
+
+		jgnCommands(L"restart", 1);
+		Group mygroup = decahedron(p, q, r, lattice_constant);
+		std::ofstream decahedron_file;
+		decahedron_file.open("decahedron.todel");
+		decahedron_file << "This should not be here. Pls delete it" << std::endl;
+		decahedron_file << "1.0" << std::endl;
+		decahedron_file << mygroup.primitiveVec[0] << std::endl;
+		decahedron_file << mygroup.primitiveVec[1] << std::endl;
+		decahedron_file << mygroup.primitiveVec[2] << std::endl;
+		decahedron_file << "H\n" << mygroup.N_atoms << "\nCartesian" << std::endl;
+		for (int i = 0; i < mygroup.N_atoms; i++)
+		{
+			decahedron_file << mygroup.position[i] << std::endl;
+		}
+		decahedron_file.close();
+		JGN_DropFile("decahedron.todel");
+		remove("decahedron.todel");
+		jgn_file_dropd = true;
+		goto peintit;
+	}
+
+	//char *test4 = "icosahedron(";
+	for (i = 0; i < 12; i++)
+	{
+		if (test1[23][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 12)
+	{
+		okrender = 1;
+		help = (char*)(ttt + 12);
+		jgn::string rstr = jgn::LPTSTR2string((LPTSTR)help, ')');
+		float lattice_constant;
+		int noshells;
+		// get lattice_constant
+		int rstrpos = rstr.find(",");
+		jgn::string lc = (char*)rstr.substr(0, rstrpos).c_str();
+		lattice_constant = std::stof(lc.c_str());
+		rstr.erase(0, rstrpos + 1);
+		// get noshells
+		noshells = std::stoi(rstr.c_str());
+
+		jgnCommands(L"restart", 1);
+		Group mygroup = icosahedral(lattice_constant, noshells);
+		std::ofstream icosahedral_file;
+		icosahedral_file.open("icosahedral.todel");
+		icosahedral_file << "This should not be here. Pls delete it" << std::endl;
+		icosahedral_file << "1.0" << std::endl;
+		icosahedral_file << mygroup.primitiveVec[0] << std::endl;
+		icosahedral_file << mygroup.primitiveVec[1] << std::endl;
+		icosahedral_file << mygroup.primitiveVec[2] << std::endl;
+		icosahedral_file << "H\n" << mygroup.N_atoms << "\nCartesian" << std::endl;
+		for (int i = 0; i < mygroup.N_atoms; i++)
+		{
+			icosahedral_file << mygroup.position[i] << std::endl;
+		}
+		icosahedral_file.close();
+		JGN_DropFile("icosahedral.todel");
+		remove("icosahedral.todel");
+		jgn_file_dropd = true;
+		goto peintit;
+	}
 	//char *test4 = "magmomup(";
 	for (i = 0; i < 9; i++)
 	{

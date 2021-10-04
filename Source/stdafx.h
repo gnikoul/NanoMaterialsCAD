@@ -1,5 +1,5 @@
 #pragma once
-#define NanoMaterialsCAD "NanoMaterialsCAD v1.0"
+#define NanoMaterialsCAD "NanoMaterialsCAD v1.1"
 
 #include "predefines.h"
 #include "targetver.h"

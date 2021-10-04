@@ -108,11 +108,26 @@ Group icosahedral(float lattice_constant, int noshells)
 	}
 	// Scale the positions
 	float scaling_factor = lattice_constant / sqrt(2.0 * (1.0 + pow(t, 2)));
+	float x_max = groupInit.position[0].x, x_min = groupInit.position[0].x, y_max = groupInit.position[0].y, y_min = groupInit.position[0].y, z_max = groupInit.position[0].z, z_min = groupInit.position[0].z;
 	for (int i = 0; i < groupInit.N_atoms; i++)
 	{
 		groupInit.position[i] = groupInit.position[i] * scaling_factor;
-		std::cout << groupInit.position[i] << std::endl;
+		if (groupInit.position[i].x > x_max)
+			x_max = groupInit.position[i].x;
+		if (groupInit.position[i].x < x_min)
+			x_min = groupInit.position[i].x;
+		if (groupInit.position[i].y > y_max)
+			y_max = groupInit.position[i].y;
+		if (groupInit.position[i].y < y_min)
+			y_min = groupInit.position[i].y;
+		if (groupInit.position[i].z > z_max)
+			z_max = groupInit.position[i].z;
+		if (groupInit.position[i].z < z_min)
+			z_min = groupInit.position[i].z;
 	}
+	groupInit.primitiveVec[0] = jgn::vec3(x_max - x_min + 15, 0, 0);
+	groupInit.primitiveVec[1] = jgn::vec3(0, y_max - y_min + 15, 0);
+	groupInit.primitiveVec[2] = jgn::vec3(0, 0, z_max - z_min + 15);
 
 	return groupInit;
 }
@@ -185,10 +200,26 @@ Group decahedron(int p, int q, int r, float lattice_constant)
 			}
 		}
 	}
+	float x_max = groupInit.position[0].x, x_min = groupInit.position[0].x, y_max = groupInit.position[0].y, y_min = groupInit.position[0].y, z_max = groupInit.position[0].z, z_min = groupInit.position[0].z;
 	for (int i = 0; i < groupInit.N_atoms; i++)
 	{
-		std::cout << groupInit.position[i] << std::endl;
+		if (groupInit.position[i].x > x_max)
+			x_max = groupInit.position[i].x;
+		if (groupInit.position[i].x < x_min)
+			x_min = groupInit.position[i].x;
+		if (groupInit.position[i].y > y_max)
+			y_max = groupInit.position[i].y;
+		if (groupInit.position[i].y < y_min)
+			y_min = groupInit.position[i].y;
+		if (groupInit.position[i].z > z_max)
+			z_max = groupInit.position[i].z;
+		if (groupInit.position[i].z < z_min)
+			z_min = groupInit.position[i].z;
 	}
+	groupInit.primitiveVec[0] = jgn::vec3(x_max - x_min + 15, 0, 0);
+	groupInit.primitiveVec[1] = jgn::vec3(0, y_max - y_min + 15, 0);
+	groupInit.primitiveVec[2] = jgn::vec3(0, 0, z_max - z_min + 15);
+
 	return groupInit;
 }
 

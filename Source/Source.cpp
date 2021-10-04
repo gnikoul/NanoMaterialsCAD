@@ -27,9 +27,9 @@
 
 int main(int argc, char *argv[])
 {
-	icosahedral(1, 5);
+	
 	//decahedron(5, 5, 0, 1); //corect
-	getchar();
+	//getchar();
 
 #if NDEBUG
 	FreeConsole();
