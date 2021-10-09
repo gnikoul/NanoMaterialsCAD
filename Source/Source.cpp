@@ -284,7 +284,7 @@ void display1(void)//generates the graphics output.
 		}
 		glMatrixMode(GL_MODELVIEW);
 	}
-	glPointSize(pointsize);
+	//glPointSize(pointsize);
 
 	stroke_c = 0;
 	if (cam.perspective_on)
@@ -927,6 +927,9 @@ void display1(void)//generates the graphics output.
 	if (shperes_on)
 		glEnable(GL_LIGHTING);
 
+	if (universe)
+		vs.runUniverse();
+
 	//bonds.CalcBonds(3);
 	//cout << 3 << endl;
 
@@ -981,9 +984,9 @@ void myinit(void)//initialize OpenGL
 	glEnableClientState(GL_NORMAL_ARRAY);
 	//glEnable(GL_DEPTH_TEST);
 
-	truepointsize = 1000.0;
-	pointsize = truepointsize / (Svmax + 5);
-	glPointSize(pointsize);
+	//truepointsize = 1000.0;
+	//pointsize = truepointsize / (Svmax + 5);
+	glPointSize(2);
 
 
 	return;
@@ -1106,7 +1109,7 @@ void variableinit()
 
 
 	vacuum = false;
-
+	universe = false;
 
 	Rod_like = 1.0;
 	width = 1000;
@@ -1732,9 +1735,9 @@ void keyboardgl(int key, int s, int x, int y)
 			}
 			else
 			{
-				truepointsize = truepointsize + 100;
-				pointsize = truepointsize / (Svmax + 5);
-				glPointSize(pointsize);
+				//truepointsize = truepointsize + 100;
+				//pointsize = truepointsize / (Svmax + 5);
+				//glPointSize(pointsize);
 			}
 			JGN_PostRedisplay();
 		}
@@ -1753,12 +1756,12 @@ void keyboardgl(int key, int s, int x, int y)
 			}
 			else
 			{
-				truepointsize = truepointsize - 100;
+				//truepointsize = truepointsize - 100;
 				if (truepointsize < 0)
 					truepointsize = 0;
-				pointsize = truepointsize / (Svmax + 5);
+				//pointsize = truepointsize / (Svmax + 5);
 
-				glPointSize(pointsize);
+				//glPointSize(pointsize);
 			}
 			JGN_PostRedisplay();
 		}	
@@ -2504,9 +2507,9 @@ void menuf(int c)
 
 		if (cam.perspective_on)
 		{
-			truepointsize = 1000.0;
-			pointsize = truepointsize / (Svmax + 5);
-			glPointSize(pointsize);
+			//truepointsize = 1000.0;
+			//pointsize = truepointsize / (Svmax + 5);
+			//glPointSize(pointsize);
 
 			cam.perspective_on = 0;
 			glViewport(0, 0, width, height);//(first 2 sets the lower left corner of the window w h sets width height of the window
@@ -2545,8 +2548,8 @@ void menuf(int c)
 			glLoadIdentity();
 			//gluPerspective(60, (float)width / (float)height, 0.001, 100);
 			glMatrixMode(GL_MODELVIEW);
-			truepointsize = 1000.0;
-			pointsize = truepointsize / (Svmax + 5);
+			//truepointsize = 1000.0;
+			//pointsize = truepointsize / (Svmax + 5);
 			glPointSize(pointsize);
 
 		}
@@ -3013,7 +3016,7 @@ void mouse_func(int b, int s, int x, int y)
 		{
 			Svmax = 0;
 		}
-		pointsize = truepointsize/(Svmax + 5);
+		//pointsize = truepointsize/(Svmax + 5);
 		JGN_PostRedisplay();
 
 	}
@@ -3022,7 +3025,7 @@ void mouse_func(int b, int s, int x, int y)
 
 		Svmax = Svmax + 5;
 
-		pointsize = truepointsize/(Svmax + 5);
+		//pointsize = truepointsize/(Svmax + 5);
 
 		JGN_PostRedisplay();
 

@@ -633,7 +633,15 @@ void VSystem::_drawatoms()
 					glRotatef(-theta[1], 0.0, 0, 1);
 					glRotatef(-theta[0], 1.0, 0.0, 0.0);
 					glRotatef(90, 1.0, 0.0, 0.0);
-					JGN_SolidSphere(this->group[g].radius[i] / (Svmax + 5), sphStacks, sphSides);
+					if (shperes_on) {
+						JGN_SolidSphere(this->group[g].radius[i] / (Svmax + 5), sphStacks, sphSides);
+					}
+					else{
+						glPointSize(5 * this->group[g].radius[i]);
+						glBegin(GL_POINTS);
+							glVertex3f(0.0, 0.0, 0.0);
+						glEnd();
+					}
 					glRotatef(-90, 1.0, 0.0, 0.0);
 					glRotatef(theta[0], 1.0, 0.0, 0.0);
 					glRotatef(theta[1], 0.0, 0, 1);
@@ -4193,4 +4201,65 @@ void drawMoldsLines(float *p, float *p1)
 	glTranslatef(-(sized[0]/2) * (vs.original->group[vs._isimulationBox].primitiveVec[0].x + vs.original->group[vs._isimulationBox].primitiveVec[1].x + vs.original->group[vs._isimulationBox].primitiveVec[2].x) / (Svmax + 5),
 		-(sized[1]/2) * (vs.original->group[vs._isimulationBox].primitiveVec[0].y + vs.original->group[vs._isimulationBox].primitiveVec[1].y + vs.original->group[vs._isimulationBox].primitiveVec[2].y) / (Svmax + 5),
 		-(sized[2]/2) * (vs.original->group[vs._isimulationBox].primitiveVec[0].z + vs.original->group[vs._isimulationBox].primitiveVec[1].z + vs.original->group[vs._isimulationBox].primitiveVec[2].z) / (Svmax + 5));
+}
+
+void VSystem::runUniverse()
+{
+	for (int g = 0; g < this->N_groups; g++)
+	{
+		for (int i = 0; i < this->group[g].N_atoms; i++)
+		{
+			jgn::vec3 a = jgn::vec3( 0,0,0);
+			//acceleration
+			for (int g2 = 0; g2 < this->N_groups; g2++)
+			{
+				for (int i2 = 0; i2 < this->group[g2].N_atoms; i2++)
+				{
+					if (g != g2 || i != i2)
+					{
+						float a1;
+						float dist = jgn::dist3dSquare(this->group[g].position[i].x, this->group[g2].position[i2].x);
+						std::cout << dist << std::endl;
+						if (dist > 1.0)
+						{
+							a1 = 1.0 / dist;
+						}
+						else
+						{
+							a1 = dist;
+						}
+						a = (this->group[g2].position[i2] - this->group[g].position[i]) / sqrt(dist) * a1;
+					}
+				}
+			}
+			//update positions
+			this->group[g].position[i] = this->group[g].position[i] + this->group[g].velocity[i] + a;
+			//boundary conditions
+			if (this->group[g].position[i].x < 0)
+			{
+				this->group[g].position[i].x = this->group[g].position[i].x + this->group[this->_isimulationBox].primitiveVec[0].x;
+			}
+			else if (this->group[g].position[i].x > this->group[this->_isimulationBox].primitiveVec[0].x)
+			{
+				this->group[g].position[i].x = this->group[g].position[i].x - this->group[this->_isimulationBox].primitiveVec[0].x;
+			}
+			if (this->group[g].position[i].y < 0)
+			{
+				this->group[g].position[i].y = this->group[g].position[i].y + this->group[this->_isimulationBox].primitiveVec[1].y;
+			}
+			else if (this->group[g].position[i].y > this->group[this->_isimulationBox].primitiveVec[1].y)
+			{
+				this->group[g].position[i].y = this->group[g].position[i].y - this->group[this->_isimulationBox].primitiveVec[1].y;
+			}
+			if (this->group[g].position[i].z < 0)
+			{
+				this->group[g].position[i].z = this->group[g].position[i].z + this->group[this->_isimulationBox].primitiveVec[2].z;
+			}
+			else if (this->group[g].position[i].z > this->group[this->_isimulationBox].primitiveVec[2].z)
+			{
+				this->group[g].position[i].z = this->group[g].position[i].z - this->group[this->_isimulationBox].primitiveVec[2].z;
+			}
+
+		}
+	}
 }

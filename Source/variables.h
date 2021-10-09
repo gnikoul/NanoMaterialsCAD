@@ -230,7 +230,7 @@ EXT int shperes_on;// render as spheres or points
 
 #ifdef JGN_WINDOWS_CPP
 
-static const int testsc = 25;
+static const int testsc = 26;
 static char *test1[testsc] = { "vector(",
 "clean",
 "undo",
@@ -255,7 +255,8 @@ static char *test1[testsc] = { "vector(",
 "placerandomly(",
 "magmomup(",
 "icosahedron(",
-"decahedron("
+"decahedron(",
+"createuniverse"
 };
 static char *test1low[testsc] = { "vector(",
 "clean",
@@ -281,7 +282,8 @@ static char *test1low[testsc] = { "vector(",
 "placerandomly(",
 "magmomup(",
 "icosahedron(",
-"decahedron("
+"decahedron(",
+"createuniverse"
 };
 static wchar_t *helplist[testsc] = { L"vector(int h,int c,int l,int A)",
 L"clean",
@@ -307,7 +309,8 @@ L"randstress",
 L"placerandomly(element, min distance",//randomly place an "element" atom to the system with a minimum distance of # from evry atom
 L"magmomup(h,k,l)",//rotate the atoms and the unit vectors of a surface, so that magmom looks upwards
 L"icosahedron(lattice constant, int noshells)",
-L"decahedron(int p, int q, int r, float lattice_constant)"
+L"decahedron(int p, int q, int r, float lattice_constant)",
+L"createuniverse"
 };
 #endif	// JGN_SOURCE_CPP
 
@@ -362,3 +365,5 @@ EXT int ka8isterimenoflag;
 EXT FILE *NewPCF;
 EXT int help0;
 EXT int help1;
+
+EXT bool universe;

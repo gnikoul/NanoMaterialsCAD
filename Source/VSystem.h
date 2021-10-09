@@ -18,6 +18,7 @@ public:
 	jgn::vec3 primitiveVec[3];//the primitiveVec
 	jgn::vec3 primitiveBase[3];//the primitiveVec/|primitiveVec|
 	std::vector<jgn::vec3> position;
+	std::vector<jgn::vec3> velocity;
 	std::vector<jgn::vec3> fractional;//fractional coordinats
 	std::vector<jgn::string> type;
 	int _N_types;
@@ -100,6 +101,7 @@ public:
 	void selected_change_draw();
 	void updateinfo();
 	void restart();
+	void runUniverse();
 	void reserve(const unsigned int sx, const unsigned int sy, const unsigned int sz);// reserve for supercell sx,sy,sz
 	class Grouplist
 	{

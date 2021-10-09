@@ -1878,7 +1878,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 
-	//JGN_DisplayF(JGN_Global_Draw);
 
 	return 0;
 }
@@ -3606,8 +3605,8 @@ void jgnCommands(LPTSTR ttt, int d)
 		shperes_on = 1;
 		glEnable(GL_LIGHTING);
 
-		sphStacks = 2;
-		sphSides = 3;
+		//sphStacks = 2;
+		//sphSides = 3;
 
 		goto peintit;
 
@@ -4063,6 +4062,32 @@ void jgnCommands(LPTSTR ttt, int d)
 		goto peintit;
 	}
 
+	//char *test4 = "createuniverse";
+	for (i = 0; i < 14; i++)
+	{
+		if (test1[25][i] == ttt[i])
+		{
+
+		}
+		else
+		{
+			i = 100;
+		}
+	}
+	if (i == 14)
+	{
+		okrender = 1;
+		universe = true;
+		for (int g = 0; g < vs.N_groups; g++)
+		{
+			for (int i = 0; i < vs.group[g].N_atoms; i++)
+			{
+				vs.group[g].velocity[i] = jgn::vec3(rand() / (float)RAND_MAX - 0.5, rand() / (float)RAND_MAX - 0.5, rand() / (float)RAND_MAX - 0.5);
+			}
+		}
+		jgnCommands(L"points", 1);
+		goto peintit;
+	}
 	//char *test4 = "decahedron(";
 	for (i = 0; i < 11; i++)
 	{
