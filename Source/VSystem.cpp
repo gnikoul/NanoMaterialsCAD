@@ -4237,27 +4237,27 @@ void VSystem::runUniverse()
 			//boundary conditions
 			if (this->group[g].position[i].x < 0)
 			{
-				this->group[g].position[i].x = this->group[g].position[i].x + this->group[this->_isimulationBox].primitiveVec[0].x;
+				this->group[g].velocity[i].x = abs(this->group[g].velocity[i].x);
 			}
 			else if (this->group[g].position[i].x > this->group[this->_isimulationBox].primitiveVec[0].x)
 			{
-				this->group[g].position[i].x = this->group[g].position[i].x - this->group[this->_isimulationBox].primitiveVec[0].x;
+				this->group[g].velocity[i].x = -abs(this->group[g].velocity[i].x);
 			}
 			if (this->group[g].position[i].y < 0)
 			{
-				this->group[g].position[i].y = this->group[g].position[i].y + this->group[this->_isimulationBox].primitiveVec[1].y;
+				this->group[g].velocity[i].y = abs(this->group[g].velocity[i].y);
 			}
 			else if (this->group[g].position[i].y > this->group[this->_isimulationBox].primitiveVec[1].y)
 			{
-				this->group[g].position[i].y = this->group[g].position[i].y - this->group[this->_isimulationBox].primitiveVec[1].y;
+				this->group[g].velocity[i].y = -abs(this->group[g].velocity[i].y);
 			}
 			if (this->group[g].position[i].z < 0)
 			{
-				this->group[g].position[i].z = this->group[g].position[i].z + this->group[this->_isimulationBox].primitiveVec[2].z;
+				this->group[g].velocity[i].z = abs(this->group[g].velocity[i].z);
 			}
 			else if (this->group[g].position[i].z > this->group[this->_isimulationBox].primitiveVec[2].z)
 			{
-				this->group[g].position[i].z = this->group[g].position[i].z - this->group[this->_isimulationBox].primitiveVec[2].z;
+				this->group[g].velocity[i].z = -abs(this->group[g].velocity[i].z);
 			}
 
 		}
